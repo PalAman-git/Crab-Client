@@ -4,7 +4,6 @@
 
 Freelancers don’t lose work because of bad skills — they lose it because things slip through the cracks. CrabClient is built to solve exactly that.
 
----
 
 ## ✨ What is CrabClient?
 
@@ -19,7 +18,6 @@ Everything in CrabClient revolves around *attention items* — things that requi
 - Pending invoices
 - Upcoming deadlines
 
----
 
 ## 🎯 The Problem
 
@@ -33,7 +31,6 @@ As a result, freelancers:
 - Miss invoice reminders
 - Lose trust and revenue
 
----
 
 ## 💡 The Solution
 
@@ -45,7 +42,6 @@ CrabClient provides a **single, focused workflow**:
 
 No noise. No over-engineering.
 
----
 
 ## 🧠 Core Concept: Attention Items
 
@@ -63,7 +59,6 @@ Each attention item has:
 
 This keeps the system simple, flexible, and powerful.
 
----
 
 ## 🧩 Phase 1 Features (Current)
 
@@ -74,7 +69,6 @@ This keeps the system simple, flexible, and powerful.
 - 🧾 Invoice tracking (lightweight, reminder-based)
 - 🛎️ In-app notifications (email planned)
 
----
 
 ## 🛠️ Tech Stack
 
@@ -86,7 +80,6 @@ This keeps the system simple, flexible, and powerful.
 - **Styling:** Tailwind CSS
 - **Deployment:** Planned for Vercel
 
----
 
 ## 🗄️ Database Design (High Level)
 
@@ -98,7 +91,6 @@ CrabClient uses a minimal, scalable schema centered around three core entities:
 
 This design avoids feature bloat while remaining future-proof.
 
----
 
 ## 🧭 Product Philosophy
 
@@ -111,7 +103,6 @@ CrabClient is built with these principles:
 
 The app is intentionally opinionated to reduce decision fatigue.
 
----
 
 ## 🚀 Future Roadmap
 
@@ -123,7 +114,6 @@ Planned features (post Phase-1):
 - Basic analytics (overdue items, response times)
 - Subscription & billing
 
----
 
 ## 📦 Getting Started (Development)
 
@@ -138,20 +128,17 @@ npx prisma generate
 npm run dev
 
 ```
----
 
 ## Make sure to set up your environment variables in .env file:
 
 - DATABASE_URL=
 - JWT_SECRET=
 
----
 
 ## 📄 License
 
 This project is currently under development and not licensed for production use yet.
 
----
 
 ## 🙌 Why CrabClient?
 
