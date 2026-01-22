@@ -1,0 +1,85 @@
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+
+  clients    Client[]
+  attentions Attention[]
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  status    ClientStatus @default(ACTIVE)
+
+  userId    String
+  user      User   @relation(fields: [userId], references: [id])
+
+  attentions Attention[]
+
+  createdAt DateTime @default(now())
+}
+
+model Attention {
+  id           String   @id @default(cuid())
+  type         AttentionType
+  priority     Priority @default(MEDIUM)
+
+  title        String
+  description  String?
+
+  amount       Int?
+  dueDate      DateTime?
+  lastActionAt DateTime?
+
+  status       AttentionStatus @default(OPEN)
+
+  userId       String
+  user         User   @relation(fields: [userId], references: [id])
+
+  clientId     String
+  client       Client @relation(fields: [clientId], references: [id])
+
+  createdAt    DateTime @default(now())
+  completedAt  DateTime?
+
+  @@index([userId, status, dueDate])
+  @@index([clientId, status])
+  @@index([userId, type, status])
+}
+
+enum ClientStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum AttentionType {
+  FOLLOW_UP
+  INVOICE
+  DEADLINE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum AttentionStatus {
+  OPEN
+  COMPLETED
+  SNOOZED
+}
