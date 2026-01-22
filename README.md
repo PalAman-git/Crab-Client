@@ -5,6 +5,7 @@
 Freelancers don’t lose work because of bad skills — they lose it because things slip through the cracks. CrabClient is built to solve exactly that.
 
 
+
 ## ✨ What is CrabClient?
 
 CrabClient is a lightweight SaaS-style web application designed for **freelancers and solo developers** who juggle multiple clients and responsibilities.
