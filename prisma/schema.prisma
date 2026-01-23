@@ -16,6 +16,8 @@ model User {
 
   clients    Client[]
   attentions Attention[]
+
+  sessions Session[]
 }
 
 model Client {
@@ -58,6 +60,36 @@ model Attention {
   @@index([userId, status, dueDate])
   @@index([clientId, status])
   @@index([userId, type, status])
+}
+
+model Session {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  // Optional but very valuable (future UI)
+  userAgent     String?
+  ipAddress     String?
+
+  refreshTokens RefreshToken[]
+
+  @@index([userId])
+}
+
+model RefreshToken{
+  id String @id @default(cuid())
+  sessionId String
+  session Session @relation(fields: [sessionId],references: [id],onDelete: Cascade)
+
+  hashedToken String
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+
+  @@index([sessionId])
+  @@unique([hashedToken])
 }
 
 enum ClientStatus {
