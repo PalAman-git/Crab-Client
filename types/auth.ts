@@ -8,7 +8,6 @@ export interface SignupInput{
 
 export interface SignupResponse{
     user:PublicUser
-    accessToken:string
 }
 
 export interface LoginInput {
@@ -18,10 +17,13 @@ export interface LoginInput {
 
 export interface LoginResponse{
     user:PublicUser
-    accessToken:string
 }
 
 export interface AuthUser{
     id:string
     email:string
+}
+
+export interface RefreshTokenResponse{
+    message:string
 }

@@ -13,20 +13,28 @@ export async function POST(req: Response) {
             ua: req.headers.get('user-agent') ?? undefined,
         })
 
-        let cookieStore = await cookies();
+        const cookieStore = await cookies();
         cookieStore.set("refresh_token",result.refreshToken,{
             httpOnly:true,
             secure:process.env.NODE_ENV === "production",
-            sameSite:"strict",
+            sameSite:"lax",
             path:"/",
-            maxAge:30 * 24 * 60 * 60,
+            maxAge:30 * 24 * 60 * 60,//30 days
+        })
+
+        cookieStore.set("access_token",result.accessToken,{
+            httpOnly:true,
+            secure:process.env.NODE_ENV === "production",
+            sameSite:"lax",
+            path:"/",
+            maxAge:60 * 15, //15 min
         })
 
         const response: ApiResponse<LoginResponse> = {
             success: true,
             data: {
                 user: result.user,
-                accessToken: result.accessToken
+                
             },
         }
 

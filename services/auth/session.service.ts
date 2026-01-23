@@ -12,6 +12,16 @@ class SessionService{
         })
     }
 
+    async getSessionWithSessionId(sessionId:string){
+        const session = await prisma.session.findUnique({
+            where:{id:sessionId},
+            include:{user:true}
+        })
+
+        if(!session) throw new Error("Session expired")
+        return session
+    }
+
     async revokeSession(sessionId:string){
         return await prisma.session.update({
             where:{id:sessionId},

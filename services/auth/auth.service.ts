@@ -2,7 +2,8 @@ import { userService } from "../user/user.service";
 import { sessionService } from "./session.service";
 import { refreshTokenService } from "./refresh-token.service";
 import { tokenService } from "./token.service";
-import { LoginInput,SignupInput } from "../../types/auth"
+import { LoginInput,SignupInput } from "@/types/auth"
+import prisma from "@/lib/prisma";
 
 
 class AuthService {
@@ -57,6 +58,20 @@ class AuthService {
             accessToken,
             refreshToken
         }
+    }
+
+    async refreshToken(oldRefreshToken:string){
+        const newRefreshToken = await refreshTokenService.rotateRefreshToken(oldRefreshToken);
+
+        const session = await sessionService.getSessionWithSessionId(oldRefreshToken);
+
+        const access_token = tokenService.issueAccessToken({userId:session.user.id,sessionId:session.id})
+
+        return {
+            access_token,
+            newRefreshToken
+        }
+
     }
 
     async logout(sessionId:string){
