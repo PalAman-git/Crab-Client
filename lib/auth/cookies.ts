@@ -10,10 +10,8 @@ const baseOptions = {
   path: '/',
 }
 
-export async function setAuthCookies(
-  accessToken: string,
-  refreshToken: string
-) {
+export async function setAuthCookies(accessToken: string,refreshToken: string) {
+
   const store = await cookies()
 
   store.set(ACCESS_COOKIE, accessToken, {
@@ -23,7 +21,7 @@ export async function setAuthCookies(
 
   store.set(REFRESH_COOKIE, refreshToken, {
     ...baseOptions,
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: 60 * 60 * 24 * 30, // 30 days
   })
 }
 

@@ -1,0 +1,41 @@
+import prisma from '@/lib/prisma'
+import {generateRefreshToken} from '@/lib/auth/refresh-token'
+import {hashToken} from '@/lib/auth/hash'
+
+class RefreshTokenService {
+    async issue(sessionId:string){
+        const token = generateRefreshToken()
+        const hashed = hashToken(token)
+
+        await prisma.refreshToken.create({
+            data:{
+                sessionId,
+                hashedToken:hashed,
+            }
+        })
+        return token
+    }
+
+
+    async rotate(oldToken:string){
+        const hashedToken = hashToken(oldToken)
+
+        const storedRefreshToken = await prisma.refreshToken.findUnique({
+            where:{hashedToken:hashedToken},
+            include:{session:true},//how it acts as a JOIN?
+        })
+
+        if(!storedRefreshToken || storedRefreshToken.revokedAt || storedRefreshToken.session.revokedAt){
+            throw new Error("Invalid session") //what is the between catch and throw?
+        }
+
+        await prisma.refreshToken.update({
+            where:{id:storedRefreshToken.id},
+            data:{revokedAt: new Date()},
+        })//how the data update here???
+
+        return this.issue(storedRefreshToken.sessionId)
+    }
+}
+
+export const refreshTokenService = new RefreshTokenService();
