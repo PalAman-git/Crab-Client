@@ -41,9 +41,9 @@ class AuthService {
     async signup(input:SignupInput,meta?:{ip?:string;ua?:string}){
 
         //check if the email already exists
-        const existingUser = await userService.getUserByEmail(input.email);
+        // const existingUser = await userService.getUserByEmail(input.email);
 
-        if(existingUser) throw new Error("Email already registered");
+        // if(existingUser) throw new Error("Email already registered");
 
         //create user
         const user = await userService.createUser(input);
@@ -51,9 +51,11 @@ class AuthService {
         //create session
         const session = await sessionService.createSession(user.id,meta);
 
-        //generate tokens
-        const accessToken = tokenService.issueAccessToken({userId:user.id,sessionId:session.id});
-        const refreshToken = refreshTokenService.issueRefreshToken(session.id)
+        //generate refresh token
+        const refreshToken = await refreshTokenService.issueRefreshToken(session.id)
+
+        //generate access token
+        const accessToken =  tokenService.issueAccessToken({userId:user.id,sessionId:session.id});
 
         return {
             user,

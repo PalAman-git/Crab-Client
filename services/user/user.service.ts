@@ -19,7 +19,6 @@ function toPublicUser(user:{
 
 
 class UserService {
-
     async createUser(input:SignupInput){
         const hashedPassword = await bcryptPassword(input.password);
 
@@ -31,7 +30,6 @@ class UserService {
                 createdAt: new Date()
             }
         })
-
         return toPublicUser(user);
     }
 
@@ -46,7 +44,7 @@ class UserService {
 
         if (!user) return false;
         return validatePassword(password, user.passwordHash)
-    }
+    }//thinking of making a new service for password
 
 
     async getUserByEmail(email: string): Promise<PublicUser> {

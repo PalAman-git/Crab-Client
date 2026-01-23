@@ -6,6 +6,11 @@ export interface SignupInput{
     password:string
 }
 
+export interface SignupResponse{
+    user:PublicUser
+    accessToken:string
+}
+
 export interface LoginInput {
     email:string
     password:string

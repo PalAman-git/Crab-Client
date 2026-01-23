@@ -17,7 +17,7 @@ class RefreshTokenService {
     }
 
 
-    async rotate(oldToken:string){
+    async rotateRefreshToken(oldToken:string){
         const hashedToken = hashToken(oldToken)
 
         const storedRefreshToken = await prisma.refreshToken.findUnique({
@@ -32,7 +32,7 @@ class RefreshTokenService {
         await prisma.refreshToken.update({
             where:{id:storedRefreshToken.id},
             data:{revokedAt: new Date()},
-        })//how the data update here???
+        })
 
         return this.issueRefreshToken(storedRefreshToken.sessionId)
     }
