@@ -33,6 +33,12 @@ class UserService {
         return toPublicUser(user);
     }
 
+    async isUserExistsByEmail(email:string):Promise<boolean>{
+        const count = await prisma.user.count({
+            where:{email}
+        }) 
+        return count > 0;
+    }
 
     async isCorrectPassword(userId: string, password: string): Promise<Boolean> {
         const user = await prisma.user.findUnique({

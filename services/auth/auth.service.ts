@@ -2,17 +2,12 @@ import { userService } from "../user/user.service";
 import { sessionService } from "./session.service";
 import { refreshTokenService } from "./refresh-token.service";
 import { tokenService } from "./token.service";
-import { LoginInput,SignupInput } from "@/types/auth";
-import { bcryptPassword } from "@/lib/auth/password";
+import { LoginInput,SignupInput } from "../../types/auth"
 
 
 class AuthService {
 
-    async login(input:LoginInput,
-        meta?: {
-        ua?: string
-        ip?: string
-    }){ 
+    async login(input:LoginInput,meta?: {ua?: string;ip?: string}){ 
         
         const user = await userService.getUserByEmail(input.email)
 
@@ -41,9 +36,9 @@ class AuthService {
     async signup(input:SignupInput,meta?:{ip?:string;ua?:string}){
 
         //check if the email already exists
-        // const existingUser = await userService.getUserByEmail(input.email);
+        const isExistingUser = await userService.isUserExistsByEmail(input.email);
 
-        // if(existingUser) throw new Error("Email already registered");
+        if(isExistingUser) throw new Error("Email already registered");
 
         //create user
         const user = await userService.createUser(input);
