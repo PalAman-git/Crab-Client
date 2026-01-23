@@ -3,7 +3,7 @@ import {generateRefreshToken} from '@/lib/auth/refresh-token'
 import {hashToken} from '@/lib/auth/hash'
 
 class RefreshTokenService {
-    async issue(sessionId:string){
+    async issueRefreshToken(sessionId:string){
         const token = generateRefreshToken()
         const hashed = hashToken(token)
 
@@ -34,7 +34,7 @@ class RefreshTokenService {
             data:{revokedAt: new Date()},
         })//how the data update here???
 
-        return this.issue(storedRefreshToken.sessionId)
+        return this.issueRefreshToken(storedRefreshToken.sessionId)
     }
 }
 

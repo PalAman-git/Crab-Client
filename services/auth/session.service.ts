@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 
 class SessionService{
-    async create(userId:string,meta?: {ip?:string;ua?:string}){
+    async createSession(userId:string,meta?: {ip?:string;ua?:string}){
         return await prisma.session.create({
             data:{
                 userId,

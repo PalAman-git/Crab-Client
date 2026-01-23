@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma'
-import { validatePassword } from '@/lib/auth/password'
+import { bcryptPassword, validatePassword } from '@/lib/auth/password'
 import { PublicUser } from '@/types/user'
+import { SignupInput } from '@/types/auth'
 
 function toPublicUser(user:{
     id:string
@@ -18,6 +19,23 @@ function toPublicUser(user:{
 
 
 class UserService {
+
+    async createUser(input:SignupInput){
+        const hashedPassword = await bcryptPassword(input.password);
+
+        const user = await prisma.user.create({
+            data:{
+                name:input.name,
+                email:input.email,
+                passwordHash:hashedPassword,
+                createdAt: new Date()
+            }
+        })
+
+        return toPublicUser(user);
+    }
+
+
     async isCorrectPassword(userId: string, password: string): Promise<Boolean> {
         const user = await prisma.user.findUnique({
             where: { id: userId },

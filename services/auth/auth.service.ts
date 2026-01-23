@@ -3,6 +3,7 @@ import { sessionService } from "./session.service";
 import { refreshTokenService } from "./refresh-token.service";
 import { tokenService } from "./token.service";
 import { LoginInput,SignupInput } from "@/types/auth";
+import { bcryptPassword } from "@/lib/auth/password";
 
 
 class AuthService {
@@ -22,10 +23,10 @@ class AuthService {
         }
 
         //create session
-        const session = await sessionService.create(user.id,meta)
+        const session = await sessionService.createSession(user.id,meta)
 
         //create refresh token(stored hashed)
-        const refreshToken = await refreshTokenService.issue(session.id)
+        const refreshToken = await refreshTokenService.issueRefreshToken(session.id)
 
         //create access token(JWT)
         const accessToken = tokenService.issueAccessToken({userId:user.id,sessionId:session.id});
@@ -44,8 +45,21 @@ class AuthService {
 
         if(existingUser) throw new Error("Email already registered");
 
-        //hash password
-        const hashedPassword = 
+        //create user
+        const user = await userService.createUser(input);
+
+        //create session
+        const session = await sessionService.createSession(user.id,meta);
+
+        //generate tokens
+        const accessToken = tokenService.issueAccessToken({userId:user.id,sessionId:session.id});
+        const refreshToken = refreshTokenService.issueRefreshToken(session.id)
+
+        return {
+            user,
+            accessToken,
+            refreshToken
+        }
     }
 
     async logout(sessionId:string){
