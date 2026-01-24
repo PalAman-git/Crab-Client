@@ -9,7 +9,7 @@ export async function POST(req:Request){
     try{
         const body:SignupInput = await req.json();
 
-        const result = await authService.signup(body,{
+        const result = await authService.signup(body.name,body.email,body.password,{
             ip:req.headers.get('x-forwarded-for') ?? undefined,
             ua:req.headers.get('user-agent') ?? undefined,
         })
@@ -37,7 +37,7 @@ export async function POST(req:Request){
             data:null
         }
         return NextResponse.json(response,{status:201})
-        
+
     } catch(err:any){
         const response:ApiResponse<null> = {
             success:false,

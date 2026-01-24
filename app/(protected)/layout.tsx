@@ -1,16 +1,39 @@
+"use client";
 
-interface DashboardLayoutProps {
-  children: React.ReactNode
-}
+import { ReactNode, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useMe } from "@/hooks/auth/useMe";
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function ProtectedLayout({children}: {children: ReactNode;}) {
+  const { isAuthenticated, isLoading } = useMe();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isLoading, isAuthenticated, router]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Redirecting...</p>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex h-screen w-screen">
-      
-      <main className="flex-1 overflow-y-auto bg-background px-20 py-10">
-        {children}
-      </main>
-
+    <div className="min-h-screen">
+      {/* You can add navbar/sidebar here */}
+      {children}
     </div>
-  )
+  );
 }

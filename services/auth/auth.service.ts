@@ -2,16 +2,15 @@ import { userService } from "../user/user.service";
 import { sessionService } from "./session.service";
 import { refreshTokenService } from "./refresh-token.service";
 import { tokenService } from "./token.service";
-import { LoginInput,SignupInput } from "@/types/auth"
 
 
 class AuthService {
 
-    async login(input:LoginInput,meta?: {ua?: string;ip?: string}){ 
-        const user = await userService.getUserByEmail(input.email)
-        const isValid = await userService.isCorrectPassword(user.id,input.password)
+    async login(email:string,password:string,meta?: {ua?: string;ip?: string}){ 
+        const user = await userService.getUserByEmail(email);
+        const hasCorrectPassword = await userService.hasCorrectPassword(user.id,password);
 
-        if(!isValid) {
+        if(!hasCorrectPassword) {
             throw new Error("Invalid credentials")
         }
 
@@ -22,7 +21,7 @@ class AuthService {
         const refreshToken = await refreshTokenService.issueRefreshToken(session.id)
 
         //create access token(JWT)
-        const accessToken = tokenService.issueAccessToken({userId:user.id,sessionId:session.id});
+        const accessToken = tokenService.issueAccessToken(user.id,session.id);
 
         return {
             user,
@@ -31,15 +30,15 @@ class AuthService {
         }
     }
 
-    async signup(input:SignupInput,meta?:{ip?:string;ua?:string}){
+    async signup(name:string,email:string,password:string,meta?:{ip?:string;ua?:string}){
 
         //check if the email already exists
-        const isExistingUser = await userService.isUserExistsByEmail(input.email);
+        const isExistingUser = await userService.isUserExistsByEmail(email);
 
         if(isExistingUser) throw new Error("Email already registered");
 
         //create user
-        const user = await userService.createUser(input);
+        const user = await userService.createUser(name,email,password);
 
         //create session
         const session = await sessionService.createSession(user.id,meta);
@@ -48,7 +47,7 @@ class AuthService {
         const refreshToken = await refreshTokenService.issueRefreshToken(session.id)
 
         //generate access token
-        const accessToken =  tokenService.issueAccessToken({userId:user.id,sessionId:session.id});
+        const accessToken =  tokenService.issueAccessToken(user.id,session.id);
 
         return {
             user,
@@ -62,7 +61,7 @@ class AuthService {
 
         const session = await sessionService.getSessionWithSessionId(oldRefreshToken);
 
-        const access_token = tokenService.issueAccessToken({userId:session.user.id,sessionId:session.id})
+        const access_token = tokenService.issueAccessToken(session.user.id,session.id)
 
         return {
             access_token,

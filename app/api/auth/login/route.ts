@@ -8,7 +8,10 @@ export async function POST(req: Response) {
     try {
         const body:LoginInput = await req.json();
 
-        const result = await authService.login(body, {
+        console.log("email: ",body.email);
+        console.log("password: ",body.password);
+
+        const result = await authService.login(body.email,body.password, {
             ip: req.headers.get('x-forwarded-for') ?? undefined,
             ua: req.headers.get('user-agent') ?? undefined,
         })

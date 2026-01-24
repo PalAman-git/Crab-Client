@@ -1,7 +1,11 @@
+'use client'
+
+import { useMe } from "@/hooks/auth/useMe"
 
 const Dashboard = () => {
+  const { user } = useMe();
   return (
-    <div>Dashboard</div>
+    <div>Welcome {user.name}!</div>
   )
 }
 

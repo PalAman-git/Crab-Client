@@ -1,7 +1,6 @@
 import prisma from '@/lib/prisma'
 import { bcryptPassword, validatePassword } from '@/lib/auth/password'
 import { PublicUser } from '@/types/user'
-import { SignupInput } from '@/types/auth'
 
 function toPublicUser(user:{
     id:string
@@ -19,13 +18,13 @@ function toPublicUser(user:{
 
 
 class UserService {
-    async createUser(input:SignupInput){
-        const hashedPassword = await bcryptPassword(input.password);
+    async createUser(name:string,email:string,password:string){
+        const hashedPassword = await bcryptPassword(password);
 
         const user = await prisma.user.create({
             data:{
-                name:input.name,
-                email:input.email,
+                name,
+                email,
                 passwordHash:hashedPassword,
                 createdAt: new Date()
             }
@@ -40,7 +39,7 @@ class UserService {
         return count > 0;
     }
 
-    async isCorrectPassword(userId: string, password: string): Promise<Boolean> {
+    async hasCorrectPassword(userId: string, password: string): Promise<Boolean> {
         const user = await prisma.user.findUnique({
             where: { id: userId },
             select: {
@@ -63,13 +62,14 @@ class UserService {
                 createdAt: true,
             }
         });
+        console.log(user);
 
         if (!user) throw new Error('User not found');
         return toPublicUser(user);
     }
 
 
-    async getUserById(id:string):Promise<PublicUser>{
+    async getUserById(id:string){
         const user = await prisma.user.findUnique({
             where:{id},
             select:{
@@ -79,9 +79,7 @@ class UserService {
                 createdAt:true,
             }
         })
-
-        if(!user) throw new Error("User Not Found");
-        return toPublicUser(user);
+        return user;
     }
 }
 
