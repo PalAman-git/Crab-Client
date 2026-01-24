@@ -3,15 +3,12 @@ import { sessionService } from "./session.service";
 import { refreshTokenService } from "./refresh-token.service";
 import { tokenService } from "./token.service";
 import { LoginInput,SignupInput } from "@/types/auth"
-import prisma from "@/lib/prisma";
 
 
 class AuthService {
 
     async login(input:LoginInput,meta?: {ua?: string;ip?: string}){ 
-        
         const user = await userService.getUserByEmail(input.email)
-
         const isValid = await userService.isCorrectPassword(user.id,input.password)
 
         if(!isValid) {

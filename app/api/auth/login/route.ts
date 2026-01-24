@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { authService } from "@/services/auth/auth.service";
 import { NextResponse } from "next/server";
 import { ApiResponse } from "@/types/api";
-import { LoginInput, LoginResponse } from "@/types/auth";
+import { LoginInput } from "@/types/auth";
 
 export async function POST(req: Response) {
     try {
@@ -30,12 +30,9 @@ export async function POST(req: Response) {
             maxAge:60 * 15, //15 min
         })
 
-        const response: ApiResponse<LoginResponse> = {
+        const response: ApiResponse<null> = {
             success: true,
-            data: {
-                user: result.user,
-                
-            },
+            data:null
         }
 
         return NextResponse.json(response, { status: 200 })

@@ -22,6 +22,16 @@ class SessionService{
         return session
     }
 
+    async isSession(sessionId:string){
+        const session = await prisma.session.findUnique({
+            where:{id:sessionId},
+        })
+
+        if(!session || session.revokedAt) {
+            throw new Error("Session revoked");
+        }
+    }
+
     async revokeSession(sessionId:string){
         return await prisma.session.update({
             where:{id:sessionId},

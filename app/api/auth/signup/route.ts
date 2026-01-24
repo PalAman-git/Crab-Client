@@ -1,4 +1,4 @@
-import { SignupInput,SignupResponse } from "@/types/auth";
+import { SignupInput } from "@/types/auth";
 import { NextResponse } from "next/server";
 import { ApiResponse } from "@/types/api";
 import { authService } from "@/services/auth/auth.service";
@@ -32,13 +32,12 @@ export async function POST(req:Request){
             maxAge:60 * 15,//15 min
         });
 
-        const response:ApiResponse<SignupResponse> = {
+        const response:ApiResponse<null> = {
             success:true,
-            data:{
-                user:result.user,
-            }
+            data:null
         }
         return NextResponse.json(response,{status:201})
+        
     } catch(err:any){
         const response:ApiResponse<null> = {
             success:false,

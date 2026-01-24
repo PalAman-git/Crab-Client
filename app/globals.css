@@ -1,15 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: 44, 48%, 95%;      /* Page background */
+  --card: 44 40% 92%;            /* Cards */
+
+  --foreground: 44 30% 10%;      /* Main text */
+  --muted-foreground: 44 30% 35%;/* Secondary text */
+
+  --border: 44 48% 85%;          /* Borders */
+
+  --accent: 44 60% 55%;
+  --accent-hover: 44 65% 45%;
+  --accent-foreground: 20 14.3% 95%;
+
+
+  --success: 145 63% 42%;      /* Completed */
+  --warning: 38 92% 50%;       /* Overdue */
+  --destructive: 0 85% 60%;    /* Delete / error */
+
+  --chart-1: 262 80% 65%;  /* primary line / bar */
+  --chart-2: 262 70% 55%;  /* secondary */
+  --chart-3: 262 60% 45%;  /* tertiary */
+  --chart-muted: 262 40% 30%; /* grid / background */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-background: hsl(var(--background));
+  --color-card: hsl(var(--card));
+
+  --color-foreground: hsl(var(--foreground));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-border: hsl(var(--border));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-hover:hsl(var(--accent-hover));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-success:hsl(var(--success));
+  --color-warning:hsl(var(--warning));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-hover:hsl(var(--destructive-hover));
+
+  --color-chart-1:hsl(var(--chart-1));
+  --color-chart-2:hsl(var(--chart-2));
+  --color-chart-3:hsl(var(--chart-3));
+  --color-chart-muted:hsl(var(--chart-muted));
+  
 }
 
 @media (prefers-color-scheme: dark) {
