@@ -36,6 +36,31 @@ class RefreshTokenService {
 
         return this.issueRefreshToken(storedRefreshToken.sessionId)
     }
+
+    async getSessionIdFromRefreshTable(oldToken:string){
+        const hashedToken = hashToken(oldToken);
+
+        const storedRefreshToken = await prisma.refreshToken.findUnique({
+            where:{hashedToken},
+            include:{session:true}
+        })
+
+        return storedRefreshToken?.sessionId
+    }
+
+    async revokeByToken(token:string){
+        const hashed = hashToken(token);
+
+        await prisma.refreshToken.updateMany({
+            where:{
+                hashedToken:hashed,
+                revokedAt:null,
+            },
+            data:{
+                revokedAt:new Date(),
+            }
+        });
+    }
 }
 
 export const refreshTokenService = new RefreshTokenService();

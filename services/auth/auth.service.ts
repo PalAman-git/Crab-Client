@@ -58,8 +58,11 @@ class AuthService {
 
     async refreshToken(oldRefreshToken:string){
         const newRefreshToken = await refreshTokenService.rotateRefreshToken(oldRefreshToken);
+        const sessionId = await refreshTokenService.getSessionIdFromRefreshTable(oldRefreshToken);
 
-        const session = await sessionService.getSessionWithSessionId(oldRefreshToken);
+        if(!sessionId) throw new Error("Session Id not found");
+
+        const session = await sessionService.getSessionWithSessionId(sessionId);
 
         const access_token = tokenService.issueAccessToken(session.user.id,session.id)
 
@@ -70,8 +73,8 @@ class AuthService {
 
     }
 
-    async logout(sessionId:string){
-        await sessionService.revokeSession(sessionId)
+    async logout(refreshToken:string){
+        await refreshTokenService.revokeByToken(refreshToken);
     }
 
     async authenticate(accessToken:string){

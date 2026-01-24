@@ -5,7 +5,7 @@ import { useMe } from "@/hooks/auth/useMe"
 const Dashboard = () => {
   const { user } = useMe();
   return (
-    <div>Welcome {user.name}!</div>
+    <h1 className="text-5xl">Welcome {user.name}!</h1>
   )
 }
 

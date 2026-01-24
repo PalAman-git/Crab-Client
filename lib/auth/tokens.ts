@@ -1,6 +1,6 @@
 import jwt,{JwtPayload} from 'jsonwebtoken'
 
-const ACCESS_TOKEN_TTL = '15m'
+const ACCESS_TOKEN_TTL = '30m'
 
 export interface AccessTokenPayload extends JwtPayload{
   userId:string;
