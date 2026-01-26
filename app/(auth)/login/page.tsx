@@ -100,7 +100,7 @@ export default function LoginPage() {
                         type="submit"
                         className="w-full mt-6 py-3 bg-accent text-accent-foreground rounded-md hover:bg-accent-hover transition-colors cursor-pointer"
                     >
-                        Sign In
+                        Log In
                     </button>
 
                     <div className="mt-4! flex justify-end">
