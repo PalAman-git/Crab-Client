@@ -1,12 +1,202 @@
 'use client'
 
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
+import { apiFetch } from "@/lib/api/fetcher"
 import { useMe } from "@/hooks/auth/useMe"
 
-const Dashboard = () => {
-  const { user } = useMe();
+type AttentionWithClient = {
+  id: string
+  title: string
+  priority: "LOW" | "MEDIUM" | "HIGH"
+  dueDate: string | null
+  client: {
+    id: string
+    name: string
+    email: string | null
+  }
+}
+
+type ApiResponse<T> = {
+  success: boolean
+  data?: T
+  error?: string
+}
+
+export default function DashboardPage() {
+  const [isCreateClientOpen, setIsCreateClientOpen] = useState(false)
+  const {user} = useMe();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["attentions", "today"],
+    queryFn: async (): Promise<AttentionWithClient[]> => {
+      const res = await apiFetch("/api/attentions/today")
+
+      const json: ApiResponse<AttentionWithClient[]> = await res.json()
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || "Failed to fetch attentions")
+      }
+
+      return json.data!
+    },
+  })
+
   return (
-    <h1 className="text-5xl">Welcome {user.name}!</h1>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
+
+        <button
+          onClick={() => setIsCreateClientOpen(true)}
+          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+        >
+          + Create Client
+        </button>
+      </div>
+
+      {/* Attentions */}
+      <div className="rounded-lg border bg-white p-4">
+        <h2 className="mb-4 text-lg font-medium">Today’s Attentions</h2>
+
+        {isLoading && <p className="text-sm text-gray-500">Loading…</p>}
+
+        {error && (
+          <p className="text-sm text-red-600">
+            {(error as Error).message}
+          </p>
+        )}
+
+        {!isLoading && data?.length === 0 && (
+          <p className="text-sm text-gray-500">
+            No attentions due today 🎉
+          </p>
+        )}
+
+        {data && data.length > 0 && (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-gray-50 text-left">
+                <th className="px-3 py-2">Title</th>
+                <th className="px-3 py-2">Client</th>
+                <th className="px-3 py-2">Priority</th>
+                <th className="px-3 py-2">Due</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((a) => (
+                <tr key={a.id} className="border-b last:border-0">
+                  <td className="px-3 py-2">{a.title}</td>
+                  <td className="px-3 py-2">{a.client.name}</td>
+                  <td className="px-3 py-2">{a.priority}</td>
+                  <td className="px-3 py-2">
+                    {a.dueDate
+                      ? new Date(a.dueDate).toLocaleDateString()
+                      : "-"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <CreateClientDialog
+        open={isCreateClientOpen}
+        onClose={() => setIsCreateClientOpen(false)}
+      />
+    </div>
   )
 }
 
-export default Dashboard
+function CreateClientDialog({
+  open,
+  onClose,
+}: {
+  open: boolean
+  onClose: () => void
+}) {
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleCreate() {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const res = await fetch("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name, email }),
+      })
+
+      const json = await res.json()
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || "Failed to create client")
+      }
+
+      onClose()
+      setName("")
+      setEmail("")
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onClose={onClose} className="relative z-50">
+      <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
+
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <DialogPanel className="w-full max-w-md rounded-lg bg-white p-5">
+          <DialogTitle className="text-lg font-semibold">
+            Create Client
+          </DialogTitle>
+
+          <div className="mt-4 space-y-3">
+            <input
+              className="w-full rounded border px-3 py-2"
+              placeholder="Client name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <input
+              className="w-full rounded border px-3 py-2"
+              placeholder="Email (optional)"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          {error && (
+            <p className="mt-2 text-sm text-red-600">{error}</p>
+          )}
+
+          <div className="mt-5 flex justify-end gap-2">
+            <button
+              onClick={onClose}
+              className="rounded border px-3 py-1.5 text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleCreate}
+              disabled={loading}
+              className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading ? "Creating…" : "Create"}
+            </button>
+          </div>
+        </DialogPanel>
+      </div>
+    </Dialog>
+  )
+}

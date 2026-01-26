@@ -4,12 +4,9 @@ import { NextResponse } from "next/server";
 import { ApiResponse } from "@/types/api";
 import { LoginInput } from "@/types/auth";
 
-export async function POST(req: Response) {
+export async function POST(req: Request) {
     try {
         const body:LoginInput = await req.json();
-
-        console.log("email: ",body.email);
-        console.log("password: ",body.password);
 
         const result = await authService.login(body.email,body.password, {
             ip: req.headers.get('x-forwarded-for') ?? undefined,

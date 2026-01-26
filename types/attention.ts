@@ -1,15 +1,26 @@
-export type AttentionStatus = 'OPEN' | 'COMPLETED' | 'SNOOZED'
+import { AttentionType,Priority,AttentionStatus } from "@/app/generated/prisma"
 
-export type AttentionType = 'FOLLOW_UP' | 'INVOICE' | 'DEADLINE'
-
-export type AttentionPriority = 'LOW' | 'MEDIUM' | 'HIGH'
 
 export interface AttentionDTO {
     id:string
     title:string
     type: AttentionType
     status: AttentionStatus
-    priority: AttentionPriority
+    priority: Priority
     dueDate?:string
     clientId:string
 }
+
+
+export type CreateAttentionInput = {
+    userId:string
+    clientId:string
+
+    type:AttentionType
+    title:string
+    description?:string
+    amount?:number
+    dueDate?:Date
+    priority?:Priority
+}
+
