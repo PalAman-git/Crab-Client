@@ -6,7 +6,8 @@ import { tokenService } from "./token.service";
 
 class AuthService {
 
-    async login(email:string,password:string,meta?: {ua?: string;ip?: string}){ 
+    async login(email:string,password:string,meta?: {ua?: string;ip?: string}){
+        
         const user = await userService.getUserByEmail(email);
         const hasCorrectPassword = await userService.hasCorrectPassword(user.id,password);
 
@@ -14,13 +15,10 @@ class AuthService {
             throw new Error("Invalid credentials")
         }
 
-        //create session
         const session = await sessionService.createSession(user.id,meta)
 
-        //create refresh token(stored hashed)
         const refreshToken = await refreshTokenService.issueRefreshToken(session.id)
 
-        //create access token(JWT)
         const accessToken = tokenService.issueAccessToken(user.id,session.id);
 
         return {
@@ -64,10 +62,10 @@ class AuthService {
 
         const session = await sessionService.getSessionWithSessionId(sessionId);
 
-        const access_token = tokenService.issueAccessToken(session.user.id,session.id)
+        const accessToken = tokenService.issueAccessToken(session.user.id,session.id)
 
         return {
-            access_token,
+            accessToken,
             newRefreshToken
         }
 

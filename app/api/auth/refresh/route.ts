@@ -3,6 +3,7 @@ import { authService } from "@/services/auth/auth.service";
 import { cookies } from "next/headers";
 import { ApiResponse } from "@/types/api";
 import { RefreshTokenResponse } from "@/types/auth";
+import { setAuthCookies } from "@/lib/auth/cookies";
 
 
 export async function POST(){
@@ -13,23 +14,9 @@ export async function POST(){
 
         if(!oldRefreshToken) throw new Error("No refresh token")
 
-        const result = await authService.refreshToken(oldRefreshToken);
+        const { accessToken,newRefreshToken } = await authService.refreshToken(oldRefreshToken);
 
-        cookieStore.set("access_token",result.access_token,{
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            path: "/",
-            maxAge: 60 * 15,
-        })
-
-        cookieStore.set("refresh_token",result.newRefreshToken,{
-            httpOnly:true,
-            secure:process.env.NODE_ENV === 'production',
-            sameSite:'lax',
-            path:'/',
-            maxAge: 30 * 24 * 60 * 60,
-        })
+        setAuthCookies(accessToken,newRefreshToken);
 
         const response:ApiResponse<RefreshTokenResponse> = {
             success:true,

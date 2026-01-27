@@ -1,49 +1,21 @@
 'use client'
 
 import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
-import { apiFetch } from "@/lib/api/fetcher"
-import { useMe } from "@/hooks/auth/useMe"
+import { useMeQuery } from "@/queries/auth/auth.queries"
+import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
 
-type AttentionWithClient = {
-  id: string
-  title: string
-  priority: "LOW" | "MEDIUM" | "HIGH"
-  dueDate: string | null
-  client: {
-    id: string
-    name: string
-    email: string | null
-  }
-}
 
-type ApiResponse<T> = {
-  success: boolean
-  data?: T
-  error?: string
-}
 
 export default function DashboardPage() {
   const [isCreateClientOpen, setIsCreateClientOpen] = useState(false)
-  const {user} = useMe();
+  const { user } = useMeQuery();
+  const { attentions,isLoading,error } = useAttentionsTodayQuery();
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["attentions", "today"],
-    queryFn: async (): Promise<AttentionWithClient[]> => {
-      const res = await apiFetch("/api/attentions/today")
-
-      const json: ApiResponse<AttentionWithClient[]> = await res.json()
-
-      if (!res.ok || !json.success) {
-        throw new Error(json.error || "Failed to fetch attentions")
-      }
-
-      return json.data!
-    },
-  })
-
+  if(!user) return null;
+  
   return (
+    
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -69,13 +41,13 @@ export default function DashboardPage() {
           </p>
         )}
 
-        {!isLoading && data?.length === 0 && (
+        {!isLoading && attentions?.length === 0 && (
           <p className="text-sm text-gray-500">
             No attentions due today 🎉
           </p>
         )}
 
-        {data && data.length > 0 && (
+        {attentions && attentions.length > 0 && (
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-gray-50 text-left">
@@ -86,7 +58,7 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {data.map((a) => (
+              {attentions.map((a) => (
                 <tr key={a.id} className="border-b last:border-0">
                   <td className="px-3 py-2">{a.title}</td>
                   <td className="px-3 py-2">{a.client.name}</td>

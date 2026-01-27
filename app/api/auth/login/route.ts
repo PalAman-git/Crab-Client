@@ -1,34 +1,21 @@
-import { cookies } from "next/headers";
 import { authService } from "@/services/auth/auth.service";
 import { NextResponse } from "next/server";
 import { ApiResponse } from "@/types/api";
 import { LoginInput } from "@/types/auth";
+import { setAuthCookies,getAccessToken,getRefreshToken } from "@/lib/auth/cookies";
 
 export async function POST(req: Request) {
     try {
         const body:LoginInput = await req.json();
 
-        const result = await authService.login(body.email,body.password, {
+        const {accessToken,refreshToken} = await authService.login(body.email,body.password, {
             ip: req.headers.get('x-forwarded-for') ?? undefined,
             ua: req.headers.get('user-agent') ?? undefined,
         })
 
-        const cookieStore = await cookies();
-        cookieStore.set("refresh_token",result.refreshToken,{
-            httpOnly:true,
-            secure:process.env.NODE_ENV === "production",
-            sameSite:"lax",
-            path:"/",
-            maxAge:30 * 24 * 60 * 60,//30 days
-        })
-
-        cookieStore.set("access_token",result.accessToken,{
-            httpOnly:true,
-            secure:process.env.NODE_ENV === "production",
-            sameSite:"lax",
-            path:"/",
-            maxAge:60 * 15, //15 min
-        })
+       setAuthCookies(accessToken,refreshToken);
+       console.log("access_token: ",await getAccessToken())
+       console.log("refresh_token: ",await getRefreshToken())
 
         const response: ApiResponse<null> = {
             success: true,

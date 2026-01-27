@@ -1,4 +1,4 @@
-export async function apiFetch(url:string,options?:RequestInit){
+export async function fetchWithCookies(url:string,options?:RequestInit){
     let res = await fetch(url,{
         ...options,
         credentials:"include"

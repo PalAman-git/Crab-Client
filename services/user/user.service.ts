@@ -29,6 +29,7 @@ class UserService {
                 createdAt: new Date()
             }
         })
+        if(!user) throw new Error("User Cannot be created");
         return toPublicUser(user);
     }
 
@@ -62,7 +63,6 @@ class UserService {
                 createdAt: true,
             }
         });
-        console.log(user);
 
         if (!user) throw new Error('User not found');
         return toPublicUser(user);
@@ -79,6 +79,8 @@ class UserService {
                 createdAt:true,
             }
         })
+
+        if(!user) throw new Error("User not found");
         return user;
     }
 }

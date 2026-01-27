@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 
-const ACCESS_COOKIE = 'cc_access'
-const REFRESH_COOKIE = 'cc_refresh'
+const ACCESS_COOKIE = 'access_token'
+const REFRESH_COOKIE = 'refresh_token'
 
 const baseOptions = {
   httpOnly: true,

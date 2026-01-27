@@ -2,10 +2,10 @@
 
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useMe } from "@/hooks/auth/useMe";
+import { useMeQuery } from "@/queries/auth/auth.queries";
 
 export default function ProtectedLayout({children}: {children: ReactNode;}) {
-  const { isAuthenticated, isLoading } = useMe();
+  const { isAuthenticated, isLoading } = useMeQuery();
   const router = useRouter();
 
   useEffect(() => {
@@ -23,11 +23,7 @@ export default function ProtectedLayout({children}: {children: ReactNode;}) {
   }
 
   if (!isAuthenticated) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p>Redirecting...</p>
-      </div>
-    )
+    return null;
   }
 
   return (

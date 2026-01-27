@@ -1,7 +1,7 @@
 import { cookies } from "next/headers"
 import { verifyAccessToken } from "../auth/tokens"
 
-export async function getUserFromRequest() {
+export async function getUserIdAndSessionIdFromRequest() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value
 

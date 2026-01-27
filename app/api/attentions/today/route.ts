@@ -1,4 +1,4 @@
-import { getUserFromRequest } from "@/lib/api/getUserfromRequest"
+import { getUserIdAndSessionIdFromRequest } from "@/lib/api/getUserIdAndSessionIdfromRequest"
 import { attentionService } from "@/services/attention/attention.service"
 import { ApiResponse } from "@/types/api"
 import { NextResponse } from "next/server"
@@ -11,7 +11,7 @@ type AttentionWithClient = Prisma.AttentionGetPayload<{
 export async function GET() {
   try {
     // Auth (throws if invalid)
-    const { userId } = await getUserFromRequest()
+    const { userId } = await getUserIdAndSessionIdFromRequest()
 
     // Business logic
     const attentions = await attentionService.getTodaysAttentions(userId)
