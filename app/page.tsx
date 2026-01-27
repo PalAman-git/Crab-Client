@@ -9,7 +9,6 @@ export default function Home() {
         <h1>Crab Client 🦀</h1>
       </section>
       {/* <ScrollPathPage /> */}
-
       <section className="outro">
         <h1>Center div</h1>
       </section>

@@ -2,7 +2,7 @@ import { authService } from "@/services/auth/auth.service";
 import { NextResponse } from "next/server";
 import { ApiResponse } from "@/types/api";
 import { LoginInput } from "@/types/auth";
-import { setAuthCookies,getAccessToken,getRefreshToken } from "@/lib/auth/cookies";
+import { setAuthCookies } from "@/lib/auth/cookies";
 
 export async function POST(req: Request) {
     try {
@@ -14,8 +14,6 @@ export async function POST(req: Request) {
         })
 
        setAuthCookies(accessToken,refreshToken);
-       console.log("access_token: ",await getAccessToken())
-       console.log("refresh_token: ",await getRefreshToken())
 
         const response: ApiResponse<null> = {
             success: true,

@@ -5,19 +5,20 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
 import { useMeQuery } from "@/queries/auth/auth.queries"
 import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
 import { useLogoutMutation } from "@/queries/auth/auth.mutations"
+import { useCreateClientMutation } from "@/queries/client/client.mutations"
 
 
 
 export default function DashboardPage() {
-  const [ isCreateClientOpen, setIsCreateClientOpen ] = useState(false)
+  const [isCreateClientOpen, setIsCreateClientOpen] = useState(false)
   const { user } = useMeQuery();
-  const { attentions,isLoading:isAttentionsLoading,error } = useAttentionsTodayQuery();
-  const { mutate:logout,isPending:isLogoutPending } = useLogoutMutation();
+  const { attentions, isLoading: isAttentionsLoading, error } = useAttentionsTodayQuery();
+  const { mutate: logout, isPending: isLogoutPending } = useLogoutMutation();
 
-  if(!user) return null;
+  if (!user) return null;
 
   return (
-    
+
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -96,37 +97,32 @@ function CreateClientDialog({
   open: boolean
   onClose: () => void
 }) {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { mutate: createClient, isPending, error } =
+    useCreateClientMutation()
 
-  async function handleCreate() {
-    setLoading(true)
-    setError(null)
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
 
-    try {
-      const res = await fetch("/api/clients", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ name, email }),
-      })
+    const form = e.currentTarget
+    const formData = new FormData(e.currentTarget)
 
-      const json = await res.json()
+    const name = formData.get("name")?.toString().trim() as string
+    const email = formData.get("email")?.toString().trim() as string | null
 
-      if (!res.ok || !json.success) {
-        throw new Error(json.error || "Failed to create client")
+    if(!name) alert("Please Enter the required Field")
+
+    createClient(
+      {
+        name,
+        email: email || undefined,
+      },
+      {
+        onSuccess: () => {
+          form.reset()
+          onClose()
+        },
       }
-
-      onClose()
-      setName("")
-      setEmail("")
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
+    )
   }
 
   return (
@@ -139,40 +135,45 @@ function CreateClientDialog({
             Create Client
           </DialogTitle>
 
-          <div className="mt-4 space-y-3">
+          <form onSubmit={handleSubmit} className="mt-4 space-y-3">
             <input
+              name="name"
+              required
               className="w-full rounded border px-3 py-2"
               placeholder="Client name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
             />
+
             <input
+              name="email"
+              type="email"
               className="w-full rounded border px-3 py-2"
               placeholder="Email (optional)"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
             />
-          </div>
 
-          {error && (
-            <p className="mt-2 text-sm text-red-600">{error}</p>
-          )}
+            {error && (
+              <p className="text-sm text-red-600">
+                {(error as Error).message}
+              </p>
+            )}
 
-          <div className="mt-5 flex justify-end gap-2">
-            <button
-              onClick={onClose}
-              className="rounded border px-3 py-1.5 text-sm"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleCreate}
-              disabled={loading}
-              className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
-            >
-              {loading ? "Creating…" : "Create"}
-            </button>
-          </div>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded border px-3 py-1.5 text-sm"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                disabled={isPending}
+                className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                {isPending ? "Creating…" : "Create"}
+              </button>
+            </div>
+          </form>
         </DialogPanel>
       </div>
     </Dialog>

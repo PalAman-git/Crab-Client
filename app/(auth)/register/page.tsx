@@ -47,16 +47,15 @@ export default function RegisterPage() {
 
         <section className="grid text-center h-screen items-center p-8">
             <div>
-                {/* Heading */}
-                <h3 className="text-blue-gray-700 text-3xl font-semibold mb-2">
+                
+                <h3 className="text-blue-gray-700 text-3xl font-semibold mb-10">
                     Sign Up
                 </h3>
-
-                {/* Form */}
+                
                 <form action="#" onSubmit={handleSubmit} className="mx-auto max-w-[24rem] text-left">
 
                     <div className="mb-6">
-                        <label htmlFor="name" className="block mb-2 font-medium text-muted-foreground text-sm">
+                        <label htmlFor="name" className="block mb-1 font-medium text-muted-foreground text-sm">
                             What should we call you?
                         </label>
                         <input
@@ -68,9 +67,9 @@ export default function RegisterPage() {
                         />
                     </div>
 
-                    {/* Email */}
+                    
                     <div className="mb-6">
-                        <label htmlFor="email" className="block mb-2 font-medium text-muted-foreground text-sm">
+                        <label htmlFor="email" className="block mb-1 font-medium text-muted-foreground text-sm">
                             Your Email
                         </label>
                         <input
@@ -82,9 +81,9 @@ export default function RegisterPage() {
                         />
                     </div>
 
-                    {/* Password */}
+                   
                     <div className="mb-6 relative">
-                        <label htmlFor="password" className="block mb-2 font-medium text-muted-foreground text-sm">
+                        <label htmlFor="password" className="block mb-1 font-medium text-muted-foreground text-sm">
                             Password
                         </label>
 
@@ -113,38 +112,10 @@ export default function RegisterPage() {
 
                     <button
                         type="submit"
-                        className="w-full mt-6 py-3 bg-accent text-accent-foreground rounded-md hover:bg-accent-hover transition-colors cursor-pointer"
+                        className="w-full mt-4 py-3 bg-accent text-accent-foreground rounded-md hover:bg-accent-hover transition-colors cursor-pointer"
                     >
-                        Sign In
+                        Sign Up
                     </button>
-
-                    <div className="mt-4! flex justify-end">
-                        <a
-                            href="#"
-                            className="text-blue-gray-700 font-medium text-sm hover:underline"
-                        >
-                            Forgot password
-                        </a>
-                    </div>
-
-                    <button
-                        type="button"
-                        className="w-full mt-6 flex h-12 items-center justify-center gap-2 border border-card rounded-md hover:bg-card transition-colors"
-                    >
-                        <img
-                            src="https://www.material-tailwind.com/logos/logo-google.png"
-                            alt="google"
-                            className="h-6 w-6"
-                        />{" "}
-                        Sign in with Google
-                    </button>
-
-                    <p className="text-muted-foreground text-sm mt-4 text-center">
-                        Not registered?{" "}
-                        <a href="#" className="font-medium text-foreground hover:underline">
-                            Create account
-                        </a>
-                    </p>
                 </form>
             </div>
         </section>
