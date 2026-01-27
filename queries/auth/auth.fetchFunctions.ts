@@ -10,3 +10,13 @@ export async function fetchMe(){
     return res.json();
 }
 
+export async function fetchLogout(){
+    const res = await fetchWithCookies('/api/auth/logout',{
+        method:"POST",
+    });
+
+    if(!res.ok){
+        throw new Error("Logout failed")
+    }
+}
+

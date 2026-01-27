@@ -1,6 +1,8 @@
 'use client'
 
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
+import { fetchLogout } from "./auth.fetchFunctions"
 
 export function useLoginMutation() {
   const queryClient = useQueryClient()
@@ -25,4 +27,19 @@ export function useLoginMutation() {
       queryClient.invalidateQueries({ queryKey: ["me"] })
     },
   })
+}
+
+export function useLogoutMutation(){
+    const queryClient = useQueryClient();
+     const router = useRouter();
+
+    return useMutation({
+        mutationFn:fetchLogout,
+
+        onSuccess:() => {
+            queryClient.clear();//clears the cache at browser
+
+            router.replace('/login')
+        }
+    })
 }

@@ -1,25 +1,23 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { authService } from "@/services/auth/auth.service";
 import { ApiResponse } from "@/types/api";
+import { getUserIdAndSessionIdFromRequest } from "@/lib/api/getUserIdAndSessionIdfromRequest";
+import { clearAuthCookies } from "@/lib/auth/cookies";
 
 export async function POST(){
     try{
-        const cookieStore = await cookies();
-        const refreshtoken = cookieStore.get("refresh_token")?.value;
+       
+        const { sessionId } = await getUserIdAndSessionIdFromRequest();
 
-        if(refreshtoken){
-            await authService.logout(refreshtoken);
-        }
+        console.log("sessionId ",sessionId);
+        await authService.logout(sessionId)
 
-        // Clear cookies regardless
-        cookieStore.delete("access_token");
-        cookieStore.delete("refresh_token");
-
-        const response: ApiResponse<null> = {
+        const response : ApiResponse<null> = {
             success:true,
             data:null
         }
+
+        clearAuthCookies();
 
         return NextResponse.json(response,{status:200});
     } catch {

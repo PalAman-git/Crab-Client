@@ -61,6 +61,15 @@ class RefreshTokenService {
             }
         });
     }
+
+    async revokeRefreshTokenWithSessionId(sessionId:string){
+        await prisma.refreshToken.updateMany({
+            where:{sessionId,revokedAt:null},
+            data:{
+                revokedAt:new Date(),
+            }
+        })
+    }
 }
 
 export const refreshTokenService = new RefreshTokenService();

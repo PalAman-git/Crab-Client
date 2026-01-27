@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { refreshTokenService } from "./refresh-token.service";
 
 class SessionService{
     async createSession(userId:string,meta?: {ip?:string;ua?:string}){
@@ -33,6 +34,7 @@ class SessionService{
     }
 
     async revokeSession(sessionId:string){
+        await refreshTokenService.revokeRefreshTokenWithSessionId(sessionId);
         return await prisma.session.update({
             where:{id:sessionId},
             data:{revokedAt:new Date()},

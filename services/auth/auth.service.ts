@@ -71,8 +71,8 @@ class AuthService {
 
     }
 
-    async logout(refreshToken:string){
-        await refreshTokenService.revokeByToken(refreshToken);
+    async logout(sessionId:string){
+        await sessionService.revokeSession(sessionId);
     }
 
     async authenticate(accessToken:string){

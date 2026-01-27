@@ -4,16 +4,18 @@ import { useState } from "react"
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
 import { useMeQuery } from "@/queries/auth/auth.queries"
 import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
+import { useLogoutMutation } from "@/queries/auth/auth.mutations"
 
 
 
 export default function DashboardPage() {
-  const [isCreateClientOpen, setIsCreateClientOpen] = useState(false)
+  const [ isCreateClientOpen, setIsCreateClientOpen ] = useState(false)
   const { user } = useMeQuery();
-  const { attentions,isLoading,error } = useAttentionsTodayQuery();
+  const { attentions,isLoading:isAttentionsLoading,error } = useAttentionsTodayQuery();
+  const { mutate:logout,isPending:isLogoutPending } = useLogoutMutation();
 
   if(!user) return null;
-  
+
   return (
     
     <div className="p-6 space-y-6">
@@ -23,9 +25,13 @@ export default function DashboardPage() {
 
         <button
           onClick={() => setIsCreateClientOpen(true)}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 cursor-pointer"
         >
           + Create Client
+        </button>
+
+        <button className="px-3 py-2 rounded bg-black text-white cursor-pointer" onClick={() => logout()} disabled={isLogoutPending}>
+          {isLogoutPending ? "Logging out..." : "Logout"}
         </button>
       </div>
 
@@ -33,7 +39,7 @@ export default function DashboardPage() {
       <div className="rounded-lg border bg-white p-4">
         <h2 className="mb-4 text-lg font-medium">Today’s Attentions</h2>
 
-        {isLoading && <p className="text-sm text-gray-500">Loading…</p>}
+        {isAttentionsLoading && <p className="text-sm text-gray-500">Loading…</p>}
 
         {error && (
           <p className="text-sm text-red-600">
@@ -41,7 +47,7 @@ export default function DashboardPage() {
           </p>
         )}
 
-        {!isLoading && attentions?.length === 0 && (
+        {!isAttentionsLoading && attentions?.length === 0 && (
           <p className="text-sm text-gray-500">
             No attentions due today 🎉
           </p>
