@@ -5,6 +5,8 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
 import { useMeQuery } from "@/queries/auth/auth.queries"
 import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
 import { useCreateClientMutation } from "@/queries/client/client.mutations"
+import { Button } from "@/components/ui/button"
+import { useLogoutMutation } from "@/queries/auth/auth.mutations"
 
 
 
@@ -13,7 +15,8 @@ export default function DashboardPage() {
   const [isAttentionDialogOpen, setIsAttentionDialogOpen] = useState(false);
 
   const { user } = useMeQuery();
-  const { attentions, isLoading: isAttentionsLoading, error } = useAttentionsTodayQuery();
+  const { attentions, isLoading: isAttentionsLoading, error:attentionError } = useAttentionsTodayQuery();
+  const {mutate:logout,isPending:isLogoutPending,error} = useLogoutMutation()
 
   if (!user) return null;
 
@@ -24,8 +27,15 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
 
-        
+        <Button
+          onClick={() => setIsCreateClientDialogOpen(true)}
+        >
+          + Create Client
+        </Button>
 
+        <Button onClick={() => logout()} disabled={isLogoutPending}>
+          {isLogoutPending ? "Logging out..." : "Logout"}
+        </Button>
       </div>
 
       {/* Attentions */}
