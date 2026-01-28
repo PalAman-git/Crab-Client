@@ -20,7 +20,7 @@ export default function Home() {
       </section>
 
       <section style={{position:"relative", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center",background: "#0b0f14"}}>
-        <PhysicsBackground />
+       <PhysicsBackground />
         <div style={{ position: "relative", zIndex: 2 ,color:"white"}}>
           <h1 style={{fontSize:"7rem"}}>This is the End content</h1>
         </div>
