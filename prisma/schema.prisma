@@ -28,7 +28,7 @@ model Client {
   status    ClientStatus @default(ACTIVE)
 
   userId    String
-  user      User   @relation(fields: [userId], references: [id])
+  user      User   @relation(fields: [userId], references: [id],onDelete: Cascade)
 
   attentions Attention[]
 
@@ -50,10 +50,10 @@ model Attention {
   status       AttentionStatus @default(OPEN)
 
   userId       String
-  user         User   @relation(fields: [userId], references: [id])
+  user         User   @relation(fields: [userId], references: [id],onDelete: Cascade)
 
   clientId     String
-  client       Client @relation(fields: [clientId], references: [id])
+  client       Client @relation(fields: [clientId], references: [id],onDelete: Cascade)
 
   createdAt    DateTime @default(now())
   completedAt  DateTime?
@@ -65,13 +65,14 @@ model Attention {
 
 model Session {
   id String @id @default(cuid())
+
   userId String
   user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+
   expiresAt DateTime
   revokedAt DateTime?
   createdAt DateTime @default(now())
 
-  // Optional but very valuable (future UI)
   userAgent     String?
   ipAddress     String?
 
@@ -82,6 +83,7 @@ model Session {
 
 model RefreshToken{
   id String @id @default(cuid())
+
   sessionId String
   session Session @relation(fields: [sessionId],references: [id],onDelete: Cascade)
 

@@ -1,6 +1,6 @@
 import { NextRequest,NextResponse } from "next/server";
 
-export function middleware (req:NextRequest){
+export async function middleware (req:NextRequest){
     console.log("middleware hit.............");
 
     const accessToken = req.cookies.get("access_token")?.value
