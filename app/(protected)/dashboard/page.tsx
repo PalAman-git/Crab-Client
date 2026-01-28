@@ -4,16 +4,16 @@ import { useState } from "react"
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
 import { useMeQuery } from "@/queries/auth/auth.queries"
 import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
-import { useLogoutMutation } from "@/queries/auth/auth.mutations"
 import { useCreateClientMutation } from "@/queries/client/client.mutations"
 
 
 
 export default function DashboardPage() {
-  const [isCreateClientOpen, setIsCreateClientOpen] = useState(false)
+  const [isCreateClientDialogOpen, setIsCreateClientDialogOpen] = useState(false)
+  const [isAttentionDialogOpen, setIsAttentionDialogOpen] = useState(false);
+
   const { user } = useMeQuery();
   const { attentions, isLoading: isAttentionsLoading, error } = useAttentionsTodayQuery();
-  const { mutate: logout, isPending: isLogoutPending } = useLogoutMutation();
 
   if (!user) return null;
 
@@ -24,16 +24,8 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
 
-        <button
-          onClick={() => setIsCreateClientOpen(true)}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 cursor-pointer"
-        >
-          + Create Client
-        </button>
+        
 
-        <button className="px-3 py-2 rounded bg-black text-white cursor-pointer" onClick={() => logout()} disabled={isLogoutPending}>
-          {isLogoutPending ? "Logging out..." : "Logout"}
-        </button>
       </div>
 
       {/* Attentions */}
@@ -82,23 +74,12 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <CreateClientDialog
-        open={isCreateClientOpen}
-        onClose={() => setIsCreateClientOpen(false)}
-      />
     </div>
   )
 }
 
-function CreateClientDialog({
-  open,
-  onClose,
-}: {
-  open: boolean
-  onClose: () => void
-}) {
-  const { mutate: createClient, isPending, error } =
-    useCreateClientMutation()
+function CreateClientDialog({ open, onClose }: { open: boolean, onClose: () => void }) {
+  const { mutate: createClient, isPending, error } = useCreateClientMutation()
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -109,7 +90,7 @@ function CreateClientDialog({
     const name = formData.get("name")?.toString().trim() as string
     const email = formData.get("email")?.toString().trim() as string | null
 
-    if(!name) alert("Please Enter the required Field")
+    if (!name) alert("Please Enter the required Field")
 
     createClient(
       {
