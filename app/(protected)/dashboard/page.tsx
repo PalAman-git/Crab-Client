@@ -6,6 +6,7 @@ import { useMeQuery } from "@/queries/auth/auth.queries"
 import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
 import { useLogoutMutation } from "@/queries/auth/auth.mutations"
 import { useCreateClientMutation } from "@/queries/client/client.mutations"
+import { Button } from "@/components/ui/button"
 
 
 
@@ -24,16 +25,15 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
 
-        <button
+        <Button
           onClick={() => setIsCreateClientOpen(true)}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 cursor-pointer"
         >
           + Create Client
-        </button>
+        </Button>
 
-        <button className="px-3 py-2 rounded bg-black text-white cursor-pointer" onClick={() => logout()} disabled={isLogoutPending}>
+        <Button onClick={() => logout()} disabled={isLogoutPending}>
           {isLogoutPending ? "Logging out..." : "Logout"}
-        </button>
+        </Button>
       </div>
 
       {/* Attentions */}
