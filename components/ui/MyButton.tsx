@@ -4,7 +4,7 @@ type Props = {
     onOpen:() => void
 }
 
-const Button = ({ text, onOpen }:Props) => {
+const MyButton = ({ text, onOpen }:Props) => {
 
   return (
     <button
@@ -16,4 +16,4 @@ const Button = ({ text, onOpen }:Props) => {
   )
 }
 
-export default Button
+export default MyButton

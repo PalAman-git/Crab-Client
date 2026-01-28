@@ -5,7 +5,7 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
 import { useMeQuery } from "@/queries/auth/auth.queries"
 import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
 import { useCreateClientMutation } from "@/queries/client/client.mutations"
-import { LogoutButton, CreateAttentionDialog, Button } from "@/components"
+import { LogoutButton, CreateAttentionDialog, MyButton } from "@/components"
 
 
 
@@ -25,8 +25,8 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
 
-        <Button text="+ Create Client" onOpen={() => setIsCreateClientDialogOpen(true)} />
-        <Button text ="+ Create Attention" onOpen={() => setIsAttentionDialogOpen(true)} />
+        <MyButton text={"+ Create Client"} onOpen={() => setIsCreateClientDialogOpen(true)} />
+        <MyButton text ={"+ Create Attention"} onOpen={() => setIsAttentionDialogOpen(true)} />
 
         <LogoutButton />
 
