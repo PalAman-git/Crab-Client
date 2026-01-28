@@ -13,7 +13,7 @@ export async function POST(req: Request) {
             ua: req.headers.get('user-agent') ?? undefined,
         })
 
-       setAuthCookies(accessToken,refreshToken);
+        await setAuthCookies(accessToken,refreshToken);
 
         const response: ApiResponse<null> = {
             success: true,
