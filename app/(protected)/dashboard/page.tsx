@@ -28,6 +28,7 @@ export default function DashboardPage() {
         <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
 
         <Button
+          variant="outline"
           onClick={() => setIsCreateClientDialogOpen(true)}
         >
           + Create Client
