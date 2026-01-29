@@ -16,7 +16,7 @@ export default function DashboardPage() {
   const { attentions, isLoading: isAttentionsLoading, error } = useAttentionsTodayQuery();
   const { mutate:logout,isPending:isLogoutPending,error:LogoutError } = useLogoutMutation();
 
-  if (!user) return null;
+  if (!user) return alert("user is null");
 
   return (
 

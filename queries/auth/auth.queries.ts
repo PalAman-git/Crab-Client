@@ -2,13 +2,6 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { fetchMe } from './auth.fetchFunctions'
-import { PublicUser } from '@/types/user'
-
-type MeQueryResponse = {
-    user:PublicUser | null
-    isAuthenticated:boolean
-    isLoading:boolean
-}
 
 export function useMeQuery(){
     const { data,isLoading,isSuccess } = useQuery({
@@ -19,11 +12,9 @@ export function useMeQuery(){
         refetchOnWindowFocus:false,
     })
 
-    const response : MeQueryResponse = {
-        user:data?.data?.user ?? null,
+    return {
+        user:data?.data ?? null,
         isAuthenticated:isSuccess,
         isLoading,
     }
-
-    return response
 }
