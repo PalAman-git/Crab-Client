@@ -1,31 +1,21 @@
-import { NextResponse } from "next/server";
 import { authService } from "@/services/auth/auth.service";
-import { ApiResponse } from "@/types/api";
 import { getUserIdAndSessionIdFromRequest } from "@/lib/api/getUserIdAndSessionIdfromRequest";
 import { clearAuthCookies } from "@/lib/auth/cookies";
+import { successResponse,failedResponse } from "@/lib/api/responses";
 
 export async function POST(){
     try{
        
         const { sessionId } = await getUserIdAndSessionIdFromRequest();
 
-        console.log("sessionId ",sessionId);
-        await authService.logout(sessionId)
+        await authService.logout(sessionId);
 
-        const response : ApiResponse<null> = {
-            success:true,
-            data:null
-        }
+        await clearAuthCookies();
 
-        clearAuthCookies();
+        return successResponse(null);
 
-        return NextResponse.json(response,{status:200});
     } catch {
-        const response: ApiResponse<null> = {
-            success:false,
-            error:"Logout failed",
-        };
 
-        return NextResponse.json(response,{status:200});
+        return failedResponse(null,"Logout failed",500);
     }
 }

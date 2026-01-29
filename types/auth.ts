@@ -14,6 +14,3 @@ export interface AuthUser{
     email:string
 }
 
-export interface RefreshTokenResponse{
-    message:string
-}

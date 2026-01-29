@@ -1,37 +1,23 @@
-import { NextResponse } from "next/server";
 import { authService } from "@/services/auth/auth.service";
-import { cookies } from "next/headers";
-import { ApiResponse } from "@/types/api";
-import { RefreshTokenResponse } from "@/types/auth";
-import { setAuthCookies } from "@/lib/auth/cookies";
+import { getRefreshToken, setAuthCookies } from "@/lib/auth/cookies";
+import { successResponse,failedResponse } from "@/lib/api/responses";
 
 
 export async function POST(){
     try{
-
-        const cookieStore = await cookies();
-        const oldRefreshToken = cookieStore.get("refresh_token")?.value
+        
+        const oldRefreshToken = await getRefreshToken();
 
         if(!oldRefreshToken) throw new Error("No refresh token")
 
         const { accessToken,newRefreshToken } = await authService.refreshToken(oldRefreshToken);
 
-        setAuthCookies(accessToken,newRefreshToken);
+        await setAuthCookies(accessToken,newRefreshToken);
 
-        const response:ApiResponse<RefreshTokenResponse> = {
-            success:true,
-            data:{
-                message:"access token reissued and refresh token updated successfully"
-            }
-        }
+        return successResponse(null);
 
-        return NextResponse.json(response,{status:200});
+    }catch(err){
 
-    }catch(err:any){
-        const response:ApiResponse<null> = {
-            success:false,
-            error:err.message ?? "Refresh Token failed"
-        }
-        return NextResponse.json(response,{status:401});
+        return failedResponse(err,"Refresh token failed",401)
     }
 }

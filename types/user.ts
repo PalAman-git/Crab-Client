@@ -1,4 +1,4 @@
-export interface PublicUser {
+export type PublicUser = {
     id: string
     name: string | null
     email: string

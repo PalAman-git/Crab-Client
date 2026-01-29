@@ -16,3 +16,9 @@ export type UserClientParams = {
     userId:string
     clientId:string
 }
+
+export type SearchClientParams = {
+    userId:string
+    query:string
+    limit?:number
+}

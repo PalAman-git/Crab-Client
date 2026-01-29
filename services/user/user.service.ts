@@ -48,7 +48,7 @@ class UserService {
             }
         })
 
-        if (!user) return false;
+        if (!user) throw new Error("Unauthorized");
         return validatePassword(password, user.passwordHash)
     }//thinking of making a new service for password
 

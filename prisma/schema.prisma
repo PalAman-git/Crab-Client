@@ -33,6 +33,8 @@ model Client {
   attentions Attention[]
 
   createdAt DateTime @default(now())
+  
+  @@index([userId,name])
 }
 
 model Attention {

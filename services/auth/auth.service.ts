@@ -12,17 +12,14 @@ class AuthService {
         const hasCorrectPassword = await userService.hasCorrectPassword(user.id,password);
 
         if(!hasCorrectPassword) {
-            throw new Error("Invalid credentials")
+            throw new Error("Invalid credentials");
         }
 
-        const session = await sessionService.createSession(user.id,meta)
-
-        const refreshToken = await refreshTokenService.issueRefreshToken(session.id)
-
+        const session = await sessionService.createSession(user.id,meta);
+        const refreshToken = await refreshTokenService.issueRefreshToken(session.id);
         const accessToken = tokenService.issueAccessToken(user.id,session.id);
 
         return {
-            user,
             refreshToken,
             accessToken
         }
@@ -30,25 +27,15 @@ class AuthService {
 
     async signup(name:string,email:string,password:string,meta?:{ip?:string;ua?:string}){
 
-        //check if the email already exists
         const isExistingUser = await userService.isUserExistsByEmail(email);
-
         if(isExistingUser) throw new Error("Email already registered");
 
-        //create user
         const user = await userService.createUser(name,email,password);
-
-        //create session
         const session = await sessionService.createSession(user.id,meta);
-
-        //generate refresh token
         const refreshToken = await refreshTokenService.issueRefreshToken(session.id)
-
-        //generate access token
         const accessToken =  tokenService.issueAccessToken(user.id,session.id);
 
         return {
-            user,
             accessToken,
             refreshToken
         }
@@ -61,7 +48,6 @@ class AuthService {
         if(!sessionId) throw new Error("Session Id not found");
 
         const session = await sessionService.getSessionWithSessionId(sessionId);
-
         const accessToken = tokenService.issueAccessToken(session.user.id,session.id)
 
         return {
@@ -76,11 +62,10 @@ class AuthService {
     }
 
     async authenticate(accessToken:string){
-        const payload = tokenService.validateAccessToken(accessToken)
+        const payload = tokenService.validateAccessToken(accessToken);
 
-        if(!payload) return null
-
-        return userService.getUserById(payload.userId)
+        if(!payload) return null;
+        return userService.getUserById(payload.userId);
     }
 }
 

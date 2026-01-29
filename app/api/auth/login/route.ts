@@ -1,8 +1,7 @@
 import { authService } from "@/services/auth/auth.service";
-import { NextResponse } from "next/server";
-import { ApiResponse } from "@/types/api";
 import { LoginInput } from "@/types/auth";
 import { setAuthCookies } from "@/lib/auth/cookies";
+import { successResponse,failedResponse } from "@/lib/api/responses";
 
 export async function POST(req: Request) {
     try {
@@ -15,19 +14,10 @@ export async function POST(req: Request) {
 
         await setAuthCookies(accessToken,refreshToken);
 
-        const response: ApiResponse<null> = {
-            success: true,
-            data:null
-        }
+        return successResponse(null);
 
-        return NextResponse.json(response, { status: 200 })
+    } catch (err) {
 
-    } catch (err: any) {
-        const response: ApiResponse<null> = {
-            success: false,
-            error: err.message ?? "Login failed",
-        }
-
-        return NextResponse.json(response, { status: 401 });
+        return failedResponse(err,"Login Failed",401);
     }
 }
