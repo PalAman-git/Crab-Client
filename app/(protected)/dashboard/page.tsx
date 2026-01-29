@@ -5,6 +5,7 @@ import { useMeQuery } from "@/queries/auth/auth.queries"
 import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
 import { Button } from "@/components/ui/button"
 import { useLogoutMutation } from "@/queries/auth/auth.mutations"
+import { AttentionDialog } from "@/components/attention/AttentionDialogBox"
 
 
 
@@ -75,6 +76,7 @@ export default function DashboardPage() {
         )}
       </div>
 
+        <AttentionDialog open={isAttentionDialogOpen} onOpenChange={setIsAttentionDialogOpen} />
     </div>
   )
 }
