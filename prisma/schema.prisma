@@ -73,7 +73,6 @@ model Session {
   revokedAt DateTime?
   createdAt DateTime @default(now())
 
-  // Optional but very valuable (future UI)
   userAgent     String?
   ipAddress     String?
 
@@ -85,6 +84,7 @@ model Session {
 model RefreshToken{
   id String @id @default(cuid())
   
+
   sessionId String
   session Session @relation(fields: [sessionId],references: [id],onDelete: Cascade)
 

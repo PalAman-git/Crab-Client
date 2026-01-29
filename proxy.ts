@@ -1,7 +1,7 @@
 import { NextRequest,NextResponse } from "next/server";
 
-export function middleware (req:NextRequest){
-    console.log("middleware hit.............");
+export async function proxy (req:NextRequest){
+    console.log("proxy hit.............");
 
     const accessToken = req.cookies.get("access_token")?.value
     

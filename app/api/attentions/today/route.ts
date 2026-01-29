@@ -10,10 +10,8 @@ type AttentionWithClient = Prisma.AttentionGetPayload<{
 
 export async function GET() {
   try {
-    // Auth (throws if invalid)
     const { userId } = await getUserIdAndSessionIdFromRequest()
 
-    // Business logic
     const attentions = await attentionService.getTodaysAttentions(userId)
 
     const response: ApiResponse<AttentionWithClient[]> = {

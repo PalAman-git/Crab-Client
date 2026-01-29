@@ -6,7 +6,7 @@ export async function fetchWithCookies(url:string,options?:RequestInit){
 
     if(res.status === 401){
         const refreshRes = await fetch('/api/auth/refresh',{
-            method:'POST',
+            method:"POST",
             credentials:"include"
         })
 

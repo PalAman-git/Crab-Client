@@ -1,22 +1,19 @@
 'use client'
 
 import { useState } from "react"
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
 import { useMeQuery } from "@/queries/auth/auth.queries"
 import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
-import { useCreateClientMutation } from "@/queries/client/client.mutations"
 import { Button } from "@/components/ui/button"
 import { useLogoutMutation } from "@/queries/auth/auth.mutations"
 
 
 
 export default function DashboardPage() {
-  const [isCreateClientDialogOpen, setIsCreateClientDialogOpen] = useState(false)
   const [isAttentionDialogOpen, setIsAttentionDialogOpen] = useState(false);
 
   const { user } = useMeQuery();
-  const { attentions, isLoading: isAttentionsLoading, error:attentionError } = useAttentionsTodayQuery();
-  const {mutate:logout,isPending:isLogoutPending,error} = useLogoutMutation()
+  const { attentions, isLoading: isAttentionsLoading, error } = useAttentionsTodayQuery();
+  const { mutate:logout,isPending:isLogoutPending,error:LogoutError } = useLogoutMutation();
 
   if (!user) return null;
 
@@ -27,16 +24,9 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
 
-        <Button
-          variant="outline"
-          onClick={() => setIsCreateClientDialogOpen(true)}
-        >
-          + Create Client
-        </Button>
+        <Button  onClick={() => setIsAttentionDialogOpen(true)} > Create Attention </Button>
+        <Button onClick={() => logout()}> {isLogoutPending ? "Logging out ..." : "Log out"}</Button>
 
-        <Button onClick={() => logout()} disabled={isLogoutPending}>
-          {isLogoutPending ? "Logging out..." : "Logout"}
-        </Button>
       </div>
 
       {/* Attentions */}
@@ -89,85 +79,3 @@ export default function DashboardPage() {
   )
 }
 
-function CreateClientDialog({ open, onClose }: { open: boolean, onClose: () => void }) {
-  const { mutate: createClient, isPending, error } = useCreateClientMutation()
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-
-    const form = e.currentTarget
-    const formData = new FormData(e.currentTarget)
-
-    const name = formData.get("name")?.toString().trim() as string
-    const email = formData.get("email")?.toString().trim() as string | null
-
-    if (!name) alert("Please Enter the required Field")
-
-    createClient(
-      {
-        name,
-        email: email || undefined,
-      },
-      {
-        onSuccess: () => {
-          form.reset()
-          onClose()
-        },
-      }
-    )
-  }
-
-  return (
-    <Dialog open={open} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
-
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md rounded-lg bg-white p-5">
-          <DialogTitle className="text-lg font-semibold">
-            Create Client
-          </DialogTitle>
-
-          <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-            <input
-              name="name"
-              required
-              className="w-full rounded border px-3 py-2"
-              placeholder="Client name"
-            />
-
-            <input
-              name="email"
-              type="email"
-              className="w-full rounded border px-3 py-2"
-              placeholder="Email (optional)"
-            />
-
-            {error && (
-              <p className="text-sm text-red-600">
-                {(error as Error).message}
-              </p>
-            )}
-
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded border px-3 py-1.5 text-sm"
-              >
-                Cancel
-              </button>
-
-              <button
-                type="submit"
-                disabled={isPending}
-                className="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
-              >
-                {isPending ? "Creating…" : "Create"}
-              </button>
-            </div>
-          </form>
-        </DialogPanel>
-      </div>
-    </Dialog>
-  )
-}

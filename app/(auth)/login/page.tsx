@@ -1,10 +1,11 @@
 'use client'
 import { FormEvent, useState } from "react"
-import { useRouter } from 'next/navigation'
 import { Eye, EyeClosed } from "lucide-react"
+import { useLoginMutation } from "@/queries/auth/auth.mutations"
 
 export default function LoginPage() {
-    const router = useRouter()
+    const { mutate:login,isPending,error } = useLoginMutation();
+    const [passwordShown, setPasswordShown] = useState(false);
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -13,37 +14,14 @@ export default function LoginPage() {
         const email = formData.get('email')?.toString().trim();
         const password = formData.get('password')?.toString().trim();
 
-        if (!email || !password) {
-            alert("Please enter email and password");
-            return;
-        }
+        if (!email || !password)  return;
 
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            })
-
-            if (response.ok) {
-                router.push('/dashboard')
-            } else {
-                const errorData = await response.json();
-                alert(errorData.message || 'Login failed')
-            }
-        } catch (err: any) {
-            console.error('Login error: ', err);
-            alert('Network error - check console');
-        }
+        login({email,password});
     }
 
-    const [passwordShown, setPasswordShown] = useState(false);
     const togglePasswordVisiblity = () => setPasswordShown((cur) => !cur);
 
     return (
-
-
         <section className="grid text-center h-screen items-center p-8">
             <div>
                 {/* Heading */}
@@ -98,9 +76,10 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
+                        disabled={isPending}
                         className="w-full mt-6 py-3 bg-accent text-accent-foreground rounded-md hover:bg-accent-hover transition-colors cursor-pointer"
                     >
-                        Log In
+                       {isPending ? "Logging in..." : "Log In"}
                     </button>
 
                     <div className="mt-4! flex justify-end">

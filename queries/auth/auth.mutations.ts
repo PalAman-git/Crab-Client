@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { fetchLogin, fetchLogout } from "./auth.fetchFunctions"
 
 
+
 export function useLoginMutation() {
   const router = useRouter();
   const queryClient = useQueryClient()
@@ -19,12 +20,13 @@ export function useLoginMutation() {
 }
 
 export function useLogoutMutation() {
+ 
   const router = useRouter();
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: fetchLogout,
-
+  
     onSuccess: () => {
       queryClient.clear();//clears the cache at browser
       router.replace('/login')
