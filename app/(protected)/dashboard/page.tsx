@@ -8,15 +8,14 @@ import { useLogoutMutation } from "@/queries/auth/auth.mutations"
 import { AttentionDialog } from "@/components/attention/AttentionDialogBox"
 
 
-
 export default function DashboardPage() {
   const [isAttentionDialogOpen, setIsAttentionDialogOpen] = useState(false);
 
   const { user } = useMeQuery();
   const { attentions, isLoading: isAttentionsLoading, error } = useAttentionsTodayQuery();
-  const { mutate:logout,isPending:isLogoutPending,error:LogoutError } = useLogoutMutation();
+  const { mutate: logout, isPending: isLogoutPending, error: LogoutError } = useLogoutMutation();
 
-  if (!user) return alert("user is null");
+  if (!user) return null;
 
   return (
 
@@ -25,7 +24,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
 
-        <Button  onClick={() => setIsAttentionDialogOpen(true)} > Create Attention </Button>
+        <Button onClick={() => setIsAttentionDialogOpen(true)} > Create Attention </Button>
         <Button onClick={() => logout()}> {isLogoutPending ? "Logging out ..." : "Log out"}</Button>
 
       </div>
@@ -76,7 +75,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-        <AttentionDialog open={isAttentionDialogOpen} onOpenChange={setIsAttentionDialogOpen} />
+      <AttentionDialog open={isAttentionDialogOpen} onOpenChange={setIsAttentionDialogOpen} />
     </div>
   )
 }

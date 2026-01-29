@@ -1,6 +1,16 @@
 import { useMutation,useQueryClient } from "@tanstack/react-query";
-import { fetchWithCookies } from "@/lib/api/fetchWithCookies";
+import { fetchAttentionCreate } from "./attention.fetchFunctions";
 
-type CreateAttentionInput = {
-    clientId:string
+
+export function useCreateAttentionMutation(){
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn:fetchAttentionCreate,
+
+        onSuccess:() => {
+            queryClient.invalidateQueries({queryKey:['attentions']})
+            queryClient.invalidateQueries({queryKey:["attentions",'today']});
+        }
+    })
 }

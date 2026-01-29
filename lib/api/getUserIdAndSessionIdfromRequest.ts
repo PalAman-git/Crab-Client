@@ -1,17 +1,16 @@
-import { cookies } from "next/headers"
 import { verifyAccessToken } from "../auth/tokens"
+import { getAccessToken } from "../auth/cookies"
 
 export async function getUserIdAndSessionIdFromRequest() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value
+  const accessToken = await getAccessToken();
 
   if (!accessToken) {
-    throw new Error("Unauthorized") 
+    throw new Error("Unauthorized");
   }
 
   const payload = verifyAccessToken(accessToken)
   if (!payload) {
-    throw new Error("Unauthorized")
+    throw new Error("Unauthorized");
   }
 
   return {

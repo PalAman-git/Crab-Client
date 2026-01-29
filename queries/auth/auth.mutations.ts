@@ -7,7 +7,7 @@ import { fetchLogin, fetchLogout } from "./auth.fetchFunctions"
 
 export function useLoginMutation() {
   const router = useRouter();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: fetchLogin,
@@ -22,7 +22,7 @@ export function useLoginMutation() {
 export function useLogoutMutation() {
  
   const router = useRouter();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: fetchLogout,
