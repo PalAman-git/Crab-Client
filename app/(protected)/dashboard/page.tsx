@@ -75,7 +75,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <AttentionDialog open={isAttentionDialogOpen} onOpenChange={setIsAttentionDialogOpen} />
+      <AttentionDialog open={isAttentionDialogOpen} setOpen={setIsAttentionDialogOpen} />
     </div>
   )
 }

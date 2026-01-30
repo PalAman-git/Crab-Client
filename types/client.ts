@@ -2,8 +2,6 @@ export interface ClientDTO {
     id:string
     name:string
     email?: string
-    company?:string
-    createdAt:string
 }
 
 export type CreateClientParams = {
@@ -21,4 +19,10 @@ export type SearchClientParams = {
     userId:string
     query:string
     limit?:number
+}
+
+export type QueryClientResponse = {
+    id:string,
+    name:string,
+    email?:string | null,
 }

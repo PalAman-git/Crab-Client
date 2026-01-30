@@ -1,3 +1,3 @@
 export type ApiResponse<T> = 
-| { success: true; data: T | null } 
+| { success: true; data: T } 
 | { success: false; error: string }

@@ -8,8 +8,8 @@ export async function POST(req:Request){
         const { name,email }: CreateClientParams = await req.json();
         const { userId } = await getUserIdAndSessionIdFromRequest();
         
-        await clientService.createClient({name,email,userId});
-        return successResponse(null,201);
+        const client = await clientService.createClient({name,email,userId});
+        return successResponse({id:client.id,name:client.name},201);
 
     }catch(err){
 

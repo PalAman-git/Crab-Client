@@ -1,4 +1,6 @@
 import { fetchWithCookies } from "@/lib/api/fetchWithCookies";
+import { ApiResponse } from "@/types/api";
+import { QueryClientResponse } from "@/types/client";
 
 type CreateClientPayload = {
     name:string,
@@ -21,3 +23,17 @@ export async function fetchCreateClient(payload:CreateClientPayload){
 
     return json.data;
 }   
+
+
+export async function fetchSearchClient(query:string,limit=10){
+    const res = await fetchWithCookies(`/api/clients/search?q=${encodeURIComponent(query)}&limit=${limit}`)
+
+    const json :ApiResponse<QueryClientResponse[]> = await res.json();
+
+    if(!json.success){
+        throw new Error(json.error || "Failed to Search Client")
+    }
+
+    return json.data;
+}
+

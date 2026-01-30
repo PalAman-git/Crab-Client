@@ -2,7 +2,9 @@
 
 import * as React from 'react'
 import { addDays, format } from 'date-fns'
+import { Check, ChevronsUpDown } from 'lucide-react'
 
+import { cn } from '@/lib/utils'
 import {
     Dialog,
     DialogContent,
@@ -32,25 +34,29 @@ import {
     CommandList,
 } from '@/components/ui/command'
 
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover'
+
 import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent, CardFooter } from '../ui/card'
 import { useCreateAttentionMutation } from '@/queries/attention/attention.mutations'
 import { Spinner } from '../ui/spinner'
+import { useSearchClientQuery } from '@/queries/client/client.queries'
+import { useCreateClientMutation } from '@/queries/client/client.mutations'
+import { toast } from 'sonner'
 
-/* ---------------------------------- */
-/* TYPES */
-/* ---------------------------------- */
+
 
 type Props = {
     open: boolean
-    onOpenChange: (open: boolean) => void
+    setOpen: (open: boolean) => void
 }
 
-/* ---------------------------------- */
-/* COMPONENT */
-/* ---------------------------------- */
 
-export function AttentionDialog({ open, onOpenChange }: Props) {
+export function AttentionDialog({ open, setOpen }: Props) {
     // Core fields
     const [title, setTitle] = React.useState('')
     const [description, setDescription] = React.useState('')
@@ -60,38 +66,38 @@ export function AttentionDialog({ open, onOpenChange }: Props) {
     const [priority, setPriority] = React.useState<'LOW' | 'MEDIUM' | 'HIGH'>(
         'MEDIUM'
     )
+    const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
 
     // Invoice only
     const [amount, setAmount] = React.useState('')
 
-    // Client
-    const [clientId, setClientId] = React.useState<string | null>(null)
-    const [clientSearch, setClientSearch] = React.useState('')
 
     // Date
     const [dueDate, setDueDate] = React.useState<Date>(new Date())
     const [currentMonth, setCurrentMonth] = React.useState(
         new Date(new Date().getFullYear(), new Date().getMonth(), 1)
     )
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    /* ---------------------------------- */
-    /* TEMP CLIENT DATA (replace later) */
-    /* ---------------------------------- */
 
-    const clients = [
-        { id: 'cmkwkpoby000ddcabygswp5ye', name: 'Client 1' },
-        { id: 'cmkwkyfl5000edcab0js4l5sv', name: 'Client 2' },
-    ].filter((c) =>
-        c.name.toLowerCase().includes(clientSearch.toLowerCase())
-    )
-
-    /* ---------------------------------- */
-    /* SUBMIT */
-    /* ---------------------------------- */
+    // Client
+    const [selectedClient, setSelectedClient] = React.useState<{ id: string; name: string } | null>(null)
+    const [query, setQuery] = React.useState('')
+    const { data: clients = [], isFetching } = useSearchClientQuery(query);
     const { mutate: createAttention, isPending: isCreateAttentionPending, error: attentionError } = useCreateAttentionMutation();
+    const { mutateAsync: createClient, isPending: isCreateClientPending, error: createClientError } = useCreateClientMutation();
+
+
+    const canCreate =
+        query.length > 0 &&
+        !clients.some(
+            (c) => c.name.toLowerCase() === query.toLowerCase()
+        )
+
 
     const handleSubmit = async () => {
-        if (!title || !clientId) {
+        if (!title || !selectedClient) {
             alert('Title and Client are required')
             return
         }
@@ -103,21 +109,42 @@ export function AttentionDialog({ open, onOpenChange }: Props) {
             priority,
             amount: type === 'INVOICE' ? Number(amount) : undefined,
             dueDate,
-            clientId,
+            clientId: selectedClient.id,
         }
 
         console.log('CREATE ATTENTION:', payload)
 
-        createAttention(payload);
-        onOpenChange(false)
+        try {
+            createAttention(payload, {
+                onSuccess: () => {
+                    toast.success('Attention Created',{position:'top-center'});
+                    setOpen(false)
+                }
+            });
+
+        } catch (e) {
+            console.log(e);
+            toast.error(attentionError?.message)
+        }
     }
 
-    /* ---------------------------------- */
-    /* UI */
-    /* ---------------------------------- */
+    const handleCreateClient = async () => {
+        try {
+            const newClient = await createClient({
+                name: query,
+            })
+
+            setSelectedClient(newClient)
+            toast.success("Client Created",{position:'top-center'});
+            setQuery("")
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Create Attention</DialogTitle>
@@ -130,36 +157,63 @@ export function AttentionDialog({ open, onOpenChange }: Props) {
                         {/* Client */}
                         <div className="space-y-1">
                             <Label>Client *</Label>
-                            <Command className="rounded-lg border">
-                                <CommandInput
-                                    placeholder="Search client..."
-                                    value={clientSearch}
-                                    onValueChange={setClientSearch}
-                                />
-                                <CommandList>
-                                    <CommandEmpty>No client found</CommandEmpty>
-                                    {clients.map((client) => (
-                                        <CommandItem
-                                            key={client.id}
-                                            onSelect={() => {
-                                                setClientId(client.id)
-                                                setClientSearch(client.name)
-                                            }}
-                                        >
-                                            {client.name}
-                                        </CommandItem>
-                                    ))}
-                                </CommandList>
-                            </Command>
 
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="px-0 text-blue-600"
-                            >
-                                + Create new client
-                            </Button>
+                            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" role='combobox' className='w-full justify-between'>
+                                        {selectedClient ? selectedClient?.name : "Select client"}
+                                        <ChevronsUpDown className='ml-2 h-4 w-4 opacity-50' />
+                                    </Button>
+                                </PopoverTrigger>
+
+                                <PopoverContent className='p-0'>
+                                    <Command>
+                                        <CommandInput placeholder='Search client...' value={query} onValueChange={setQuery} />
+                                        <CommandList>
+
+                                            {isFetching && (
+                                                <CommandItem disabled>
+                                                    Searching...
+                                                </CommandItem>
+                                            )}
+
+                                            {!isFetching && clients.length === 0 && (
+                                                <CommandEmpty>No client found</CommandEmpty>
+                                            )}
+
+                                            {clients.map((client) => (
+                                                <CommandItem
+                                                    key={client.id}
+                                                    value={client.name}
+                                                    onSelect={() => {
+                                                        setSelectedClient(client)
+                                                        setQuery("")
+                                                    }}
+                                                >
+                                                    <Check
+                                                        className={cn(
+                                                            "mr-2 h-4 w-4",
+                                                            client.id === selectedClient?.id ? "opacity-100" : "opacity-0"
+                                                        )}
+                                                    />
+                                                    {client.name}
+                                                </CommandItem>
+                                            ))}
+
+                                            {canCreate && !isFetching && (
+                                                <CommandItem
+                                                    onSelect={handleCreateClient}
+                                                    className="text-blue-600"
+                                                >
+                                                    + Create "{query}"
+                                                </CommandItem>
+                                            )}
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
                         </div>
+
 
                         {/* Title */}
                         <div className="space-y-1">
@@ -244,10 +298,17 @@ export function AttentionDialog({ open, onOpenChange }: Props) {
                                     <Calendar
                                         mode="single"
                                         selected={dueDate}
-                                        onSelect={(d) => d && setDueDate(d)}
+                                        onSelect={(d) => { if (!d || d < today) return; setDueDate(d) }}
                                         month={currentMonth}
                                         onMonthChange={setCurrentMonth}
                                         fixedWeeks
+                                        disabled={{ before: today }}
+                                        modifiers={{
+                                            past: { before: today },
+                                        }}
+                                        modifiersClassNames={{
+                                            past: "[&>button]:line-through opacity-70",
+                                        }}
                                         className="p-0 [--cell-size:--spacing(9.5)]"
                                     />
                                 </div>
@@ -287,7 +348,7 @@ export function AttentionDialog({ open, onOpenChange }: Props) {
 
                 {/* FOOTER */}
                 <DialogFooter className='mt-3'>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                    <Button variant="outline" onClick={() => setOpen(false)}>
                         Cancel
                     </Button>
                     <Button disabled={isCreateAttentionPending} onClick={handleSubmit}>
