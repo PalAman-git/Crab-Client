@@ -11,8 +11,8 @@
 
   --border: oklch(0.929 0.013 255.508);          /* Borders */
 
-  --accent: oklch(0.7897 0.1645 70.61);
-  --accent-hover: oklch(0.7497 0.1645 70.61);
+  --accent: oklch(0.997 0.1645 60.61);
+  --accent-hover: oklch(0.9497 0.1645 0.61);
   --accent-foreground: oklch(0.208 0.042 265.755);
 
   --success: oklch(0.6645 0.1609 152.2);      /* Completed */

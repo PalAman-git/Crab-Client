@@ -47,8 +47,8 @@ import { Spinner } from '../ui/spinner'
 import { useSearchClientQuery } from '@/queries/client/client.queries'
 import { useCreateClientMutation } from '@/queries/client/client.mutations'
 import { toast } from 'sonner'
-
-
+import { AttentionType } from '@/app/generated/prisma'
+import { Priority } from '@/app/generated/prisma'
 
 type Props = {
     open: boolean
@@ -60,23 +60,16 @@ export function AttentionDialog({ open, setOpen }: Props) {
     // Core fields
     const [title, setTitle] = React.useState('')
     const [description, setDescription] = React.useState('')
-    const [type, setType] = React.useState<'FOLLOW_UP' | 'INVOICE' | 'DEADLINE'>(
-        'FOLLOW_UP'
-    )
-    const [priority, setPriority] = React.useState<'LOW' | 'MEDIUM' | 'HIGH'>(
-        'MEDIUM'
-    )
+    const [type, setType] = React.useState<AttentionType>('FOLLOW_UP')
+    const [priority, setPriority] = React.useState<Priority>('MEDIUM')
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
 
     // Invoice only
     const [amount, setAmount] = React.useState('')
 
-
     // Date
     const [dueDate, setDueDate] = React.useState<Date>(new Date())
-    const [currentMonth, setCurrentMonth] = React.useState(
-        new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-    )
+    const [currentMonth, setCurrentMonth] = React.useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -85,15 +78,13 @@ export function AttentionDialog({ open, setOpen }: Props) {
     const [selectedClient, setSelectedClient] = React.useState<{ id: string; name: string } | null>(null)
     const [query, setQuery] = React.useState('')
     const { data: clients = [], isFetching } = useSearchClientQuery(query);
-    const { mutate: createAttention, isPending: isCreateAttentionPending, error: attentionError } = useCreateAttentionMutation();
-    const { mutateAsync: createClient, isPending: isCreateClientPending, error: createClientError } = useCreateClientMutation();
+    const { mutate: createAttention,   isPending: isCreateAttentionPending, error: attentionError } = useCreateAttentionMutation();
+    const { mutateAsync: createClient, isPending: isCreateClientPending,    error: createClientError } = useCreateClientMutation();
 
 
-    const canCreate =
-        query.length > 0 &&
-        !clients.some(
-            (c) => c.name.toLowerCase() === query.toLowerCase()
-        )
+    const canCreate = query.length > 0 && !clients.some(
+        (c) => c.name.toLowerCase() === query.toLowerCase()
+    )
 
 
     const handleSubmit = async () => {
@@ -117,7 +108,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
         try {
             createAttention(payload, {
                 onSuccess: () => {
-                    toast.success('Attention Created',{position:'top-center'});
+                    toast.success('Attention Created', { position: 'top-center' });
                     setOpen(false)
                 }
             });
@@ -135,7 +126,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
             })
 
             setSelectedClient(newClient)
-            toast.success("Client Created",{position:'top-center'});
+            toast.success("Client Created", { position: 'top-center' });
             setQuery("")
         } catch (e) {
             console.log(e);
@@ -155,7 +146,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
                     {/* LEFT COLUMN */}
                     <div className="space-y-4">
                         {/* Client */}
-                        <div className="space-y-1">
+                        <div className="space-y-1 mb-5">
                             <Label>Client *</Label>
 
                             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -216,7 +207,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
 
 
                         {/* Title */}
-                        <div className="space-y-1">
+                        <div className="space-y-1 mb-5">
                             <Label>Title *</Label>
                             <Input
                                 placeholder="Follow up on proposal"
@@ -226,7 +217,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
                         </div>
 
                         {/* Type */}
-                        <div className="space-y-1">
+                        <div className="space-y-1 mb-5">
                             <Label>Type</Label>
                             <Select value={type} onValueChange={(v) => setType(v as any)}>
                                 <SelectTrigger>
@@ -241,7 +232,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
                         </div>
 
                         {/* Priority */}
-                        <div className="space-y-1">
+                        <div className="space-y-1 mb-5">
                             <Label>Priority</Label>
                             <Select
                                 value={priority}

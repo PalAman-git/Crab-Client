@@ -1,10 +1,11 @@
 import { authService } from "@/services/auth/auth.service";
-import { getRefreshToken, setAuthCookies } from "@/lib/auth/cookies";
+import { getAccessToken, getRefreshToken, setAuthCookies } from "@/lib/auth/cookies";
 import { successResponse,failedResponse } from "@/lib/api/responses";
 
 
 export async function POST(){
     try{
+        console.log('refresh_token api hit....');
         
         const oldRefreshToken = await getRefreshToken();
 
@@ -13,6 +14,8 @@ export async function POST(){
         const { accessToken,newRefreshToken } = await authService.refreshToken(oldRefreshToken);
 
         await setAuthCookies(accessToken,newRefreshToken);
+        console.log("access_token",await getAccessToken());
+        console.log('refresh_token',await getRefreshToken());
 
         return successResponse(null);
 
