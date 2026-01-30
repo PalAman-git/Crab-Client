@@ -26,7 +26,7 @@ export default function DashboardPage() {
         <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
 
         <Button onClick={() => setIsAttentionDialogOpen(true)} > Create Attention </Button>
-        <Button onClick={() => logout()}> {isLogoutPending ? "Logging out ..." : "Log out"}</Button>
+        <Button disabled={isLogoutPending} onClick={() => logout()}> {isLogoutPending ? "Logging out..." : "Log out"}</Button>
 
       </div>
 
