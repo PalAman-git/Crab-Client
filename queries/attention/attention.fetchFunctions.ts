@@ -4,7 +4,8 @@ import { AttentionType, Priority } from "@/app/generated/prisma";
 export type AttentionWithClient = {
   id: string
   title: string
-  priority: "LOW" | "MEDIUM" | "HIGH"
+  priority: Priority
+  type:AttentionType
   dueDate: string | null
   client: {
     id: string

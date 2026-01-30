@@ -73,12 +73,11 @@ export function AttentionDialog({ open, setOpen }: Props) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-
     // Client
     const [selectedClient, setSelectedClient] = React.useState<{ id: string; name: string } | null>(null)
     const [query, setQuery] = React.useState('')
     const { data: clients = [], isFetching } = useSearchClientQuery(query);
-    const { mutate: createAttention,   isPending: isCreateAttentionPending, error: attentionError } = useCreateAttentionMutation();
+    const { mutate: createAttention,   isPending: isCreateAttentionPending, error: attentionError    } = useCreateAttentionMutation();
     const { mutateAsync: createClient, isPending: isCreateClientPending,    error: createClientError } = useCreateClientMutation();
 
 
@@ -219,7 +218,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
                         {/* Type */}
                         <div className="space-y-1 mb-5">
                             <Label>Type</Label>
-                            <Select value={type} onValueChange={(v) => setType(v as any)}>
+                            <Select value={type} onValueChange={(v: any) => setType(v as any)}>
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
@@ -236,7 +235,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
                             <Label>Priority</Label>
                             <Select
                                 value={priority}
-                                onValueChange={(v) => setPriority(v as any)}
+                                onValueChange={(v: any) => setPriority(v as any)}
                             >
                                 <SelectTrigger>
                                     <SelectValue />
