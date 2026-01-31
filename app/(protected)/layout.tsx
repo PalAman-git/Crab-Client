@@ -3,8 +3,10 @@
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMeQuery } from "@/queries/auth/auth.queries";
+import Sidebar from "@/components/Sidebar/Sidebar";
+import Navbar from "@/components/Navbar/Navbar";
 
-export default function ProtectedLayout({children}: {children: ReactNode;}) {
+export default function ProtectedLayout({ children }: { children: ReactNode; }) {
   const { isAuthenticated, isLoading } = useMeQuery();
   const router = useRouter();
 
@@ -27,9 +29,14 @@ export default function ProtectedLayout({children}: {children: ReactNode;}) {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* You can add navbar/sidebar here */}
-      {children}
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar />
+      <div className="flex flex-1 flex-col border">
+        <Navbar />
+        <main className="flex-1 overflow-y-auto p-6 bg-muted/40">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

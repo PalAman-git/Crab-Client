@@ -130,6 +130,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
             setQuery("")
         } catch (e) {
             console.log(e);
+            toast.error(createClientError?.message);
         }
     }
 

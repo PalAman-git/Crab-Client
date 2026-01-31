@@ -12,8 +12,8 @@ export function useLoginMutation() {
   return useMutation({
     mutationFn: fetchLogin,
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["me"] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["me"] })
       router.replace('/dashboard')
     },
   })
