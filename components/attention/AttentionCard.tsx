@@ -1,24 +1,13 @@
-import { AttentionType, Priority } from '@/app/generated/prisma'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { getDueLabel } from '@/utils/dateTime/getDueLabel'
+import { DashboardAttention } from '@/types/dashboard'
 
 export function AttentionCard({
   attention,
 }: {
-  attention: {
-    id: string
-    title: string
-    priority: Priority
-    dueDate: string | null
-    type: AttentionType
-    client: {
-      id: string
-      name: string
-      email: string | null
-    }
-  }
+  attention: DashboardAttention
 }) {
   const due = getDueLabel(attention.dueDate)
 

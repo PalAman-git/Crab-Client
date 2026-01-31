@@ -9,7 +9,8 @@ export function useCreateAttentionMutation(){
         mutationFn:fetchAttentionCreate,
 
         onSuccess:() => {
-            queryClient.invalidateQueries({queryKey:['attentions']})
+            queryClient.invalidateQueries({queryKey:['attentions']});
+            queryClient.invalidateQueries({queryKey:['dashboard']});
             queryClient.invalidateQueries({queryKey:["attentions",'today']});
         }
     })
