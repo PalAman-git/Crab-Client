@@ -63,7 +63,7 @@ This keeps the system simple, flexible, and powerful.
 
 ## 🧩 Phase 1 Features (Current)
 
-- 🔐 Authentication (JWT-based)
+- 🔐 Authentication (JWT-based) &#10003;
 - 👤 Client management
 - ⭐ Attention items (follow-ups, invoices, deadlines)
 - 📅 “Today” dashboard showing what needs focus

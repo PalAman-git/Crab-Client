@@ -21,7 +21,7 @@ export default function Home() {
 
       
       <section style={{position:"relative", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center",background: "#0b0f14"}}>
-        {/* <PhysicsBackground /> */}
+        <PhysicsBackground />
       </section>
 
       

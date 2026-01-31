@@ -6,6 +6,7 @@ import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
 import { Button } from "@/components/ui/button"
 import { useLogoutMutation } from "@/queries/auth/auth.mutations"
 import { AttentionDialog } from "@/components/attention/AttentionDialogBox"
+import { AttentionCard } from "@/components/attention/AttentionCard"
 
 
 export default function DashboardPage() {
@@ -25,7 +26,7 @@ export default function DashboardPage() {
         <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
 
         <Button onClick={() => setIsAttentionDialogOpen(true)} > Create Attention </Button>
-        <Button onClick={() => logout()}> {isLogoutPending ? "Logging out ..." : "Log out"}</Button>
+        <Button disabled={isLogoutPending} onClick={() => logout()}> {isLogoutPending ? "Logging out..." : "Log out"}</Button>
 
       </div>
 
@@ -48,30 +49,11 @@ export default function DashboardPage() {
         )}
 
         {attentions && attentions.length > 0 && (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-gray-50 text-left">
-                <th className="px-3 py-2">Title</th>
-                <th className="px-3 py-2">Client</th>
-                <th className="px-3 py-2">Priority</th>
-                <th className="px-3 py-2">Due</th>
-              </tr>
-            </thead>
-            <tbody>
-              {attentions.map((a) => (
-                <tr key={a.id} className="border-b last:border-0">
-                  <td className="px-3 py-2">{a.title}</td>
-                  <td className="px-3 py-2">{a.client.name}</td>
-                  <td className="px-3 py-2">{a.priority}</td>
-                  <td className="px-3 py-2">
-                    {a.dueDate
-                      ? new Date(a.dueDate).toLocaleDateString()
-                      : "-"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          attentions.map((a) => (
+            <AttentionCard key={a.id} attention={a} />
+          )
+
+          )
         )}
       </div>
 
