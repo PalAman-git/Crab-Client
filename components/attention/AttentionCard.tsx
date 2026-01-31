@@ -1,6 +1,8 @@
-import { AttentionType, Priority } from "@/app/generated/prisma"
-import { Badge } from "../ui/badge"
-import { Card, CardContent } from "../ui/card"
+import { AttentionType, Priority } from '@/app/generated/prisma'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
+import { getDueLabel } from '@/utils/dateTime/getDueLabel'
 
 export function AttentionCard({
   attention,
@@ -12,48 +14,49 @@ export function AttentionCard({
     dueDate: string | null
     type: AttentionType
     client: {
-    id: string
-    name: string
-    email: string | null
-  }
+      id: string
+      name: string
+      email: string | null
+    }
   }
 }) {
-  return (
-    <Card className="hover:shadow-sm transition">
-      <CardContent className="p-4 space-y-2">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="font-medium">{attention.title}</p>
-            <p className="text-sm text-muted-foreground">
-              {attention.client.name}
-            </p>
-          </div>
+  const due = getDueLabel(attention.dueDate)
 
-          <Badge
-            variant={
-              attention.priority === 'HIGH'
-                ? 'destructive'
-                : attention.priority === 'MEDIUM'
-                ? 'secondary'
-                : 'outline'
-            }
-          >
-            {attention.priority}
-          </Badge>
+  return (
+    <Card className="px-4 py-3 hover:bg-muted/40 transition">
+      <div className="flex items-start justify-between gap-4">
+        {/* Left */}
+        <div className="min-w-0">
+          <p className="truncate font-medium text-sm">
+            {attention.title}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {attention.client.name}
+          </p>
         </div>
 
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">
-            {attention.type}
-          </span>
-
-          {attention.dueDate && (
-            <span className="font-medium">
-              Due {new Date(attention.dueDate).toLocaleDateString()}
+        {/* Right */}
+        <div className="flex items-center gap-2 shrink-0">
+          {due && (
+            <span
+              className={cn(
+                'text-xs font-medium',
+                due.tone === 'danger' && 'text-red-600',
+                due.tone === 'warning' && 'text-amber-600',
+                due.tone === 'muted' && 'text-muted-foreground'
+              )}
+            >
+              {due.text}
             </span>
           )}
+
+          {attention.priority === 'HIGH' && (
+            <Badge variant="outline" className="text-xs">
+              High
+            </Badge>
+          )}
         </div>
-      </CardContent>
+      </div>
     </Card>
   )
 }

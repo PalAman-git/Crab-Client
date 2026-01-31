@@ -1,20 +1,15 @@
 'use client'
 
-import { useState } from "react"
 import { useMeQuery } from "@/queries/auth/auth.queries"
 import { useAttentionsTodayQuery } from "@/queries/attention/attention.queries"
-import { Button } from "@/components/ui/button"
-import { useLogoutMutation } from "@/queries/auth/auth.mutations"
-import { AttentionDialog } from "@/components/attention/AttentionDialogBox"
 import { AttentionCard } from "@/components/attention/AttentionCard"
+import NewAttentionButton from "@/components/attention/NewAttentionButton"
 
 
 export default function DashboardPage() {
-  const [isAttentionDialogOpen, setIsAttentionDialogOpen] = useState(false);
 
   const { user } = useMeQuery();
   const { attentions, isLoading: isAttentionsLoading, error } = useAttentionsTodayQuery();
-  const { mutate: logout, isPending: isLogoutPending, error: LogoutError } = useLogoutMutation();
 
   if (!user) return null;
 
@@ -25,8 +20,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Welcome {user.name}!</h1>
 
-        <Button onClick={() => setIsAttentionDialogOpen(true)} > Create Attention </Button>
-        <Button disabled={isLogoutPending} onClick={() => logout()}> {isLogoutPending ? "Logging out..." : "Log out"}</Button>
+        <NewAttentionButton />
 
       </div>
 
@@ -56,8 +50,6 @@ export default function DashboardPage() {
           )
         )}
       </div>
-
-      <AttentionDialog open={isAttentionDialogOpen} setOpen={setIsAttentionDialogOpen} />
     </div>
   )
 }
