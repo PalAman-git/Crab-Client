@@ -20,9 +20,9 @@ export default function Home() {
       </section>
 
       
-      <section style={{position:"relative", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center",background: "#0b0f14"}}>
+      {/* <section style={{position:"relative", minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center",background: "#0b0f14"}}>
         <PhysicsBackground />
-      </section>
+      </section> */}
 
       
     </ReactLenis>

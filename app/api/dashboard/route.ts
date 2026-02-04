@@ -8,7 +8,7 @@ export type DashboardResponse = {
     id: string
     title: string
     priority: Priority
-    dueDate: Date | null
+    dueDate: string | null
     amount: number | null
     currency: string | null
     client: {
@@ -130,11 +130,16 @@ export async function GET() {
     }),
   ])
 
+  const mappedUrgentAttentions: DashboardResponse['urgentAttentions'] = urgentAttentions.map(a => ({
+    ...a,
+    dueDate:a.dueDate? a.dueDate.toISOString() : null,
+  }))
+
   const pendingAmount =
     (stats._sum.amount ?? 0) - (revenueAgg._sum.paidAmount ?? 0)
 
   return successResponse<DashboardResponse>({
-    urgentAttentions,
+    urgentAttentions:mappedUrgentAttentions,
 
     stats: {
       today: urgentAttentions.filter(
