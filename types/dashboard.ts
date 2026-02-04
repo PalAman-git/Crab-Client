@@ -1,4 +1,4 @@
-import { Priority } from "@prisma/client"
+import { Priority } from "./attention"
 
 export type DashboardAttention = {
   id: string

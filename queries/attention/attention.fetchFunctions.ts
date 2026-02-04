@@ -1,5 +1,5 @@
 import { fetchWithCookies } from "@/lib/api/fetchWithCookies"
-import { AttentionType, Priority } from "@prisma/client";
+import { AttentionType,Priority } from "@/types/attention";
 import { AttentionWithClient } from "@/app/api/attentions/today/route";
 
 type CreateAttentionInput = {

@@ -1,4 +1,7 @@
-import { AttentionType,Priority,AttentionStatus } from "@prisma/client"
+
+export type AttentionType = "INVOICE" | 'DEADLINE' | 'FOLLOW_UP'
+export type Priority = "LOW" | "MEDIUM" | "HIGH"
+export type AttentionStatus = 'OPEN' | "COMPLETED" | 'SNOOZED'
 
 
 export interface AttentionDTO {

@@ -47,8 +47,7 @@ import { Spinner } from '../ui/spinner'
 import { useSearchClientQuery } from '@/queries/client/client.queries'
 import { useCreateClientMutation } from '@/queries/client/client.mutations'
 import { toast } from 'sonner'
-import { AttentionType } from '@prisma/client'
-import { Priority } from '@prisma/client'
+import { AttentionType,Priority } from '@/types/attention'
 
 type Props = {
     open: boolean

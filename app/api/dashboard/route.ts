@@ -1,6 +1,6 @@
 import { getUserIdAndSessionIdFromRequest } from "@/lib/api/getUserIdAndSessionIdfromRequest"
 import prisma from "@/lib/prisma"
-import { Priority } from "@prisma/client"
+import { Priority } from "@/types/attention"
 import { successResponse } from "@/lib/api/responses"
 
 export type DashboardResponse = {
