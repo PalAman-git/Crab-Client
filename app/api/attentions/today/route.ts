@@ -5,6 +5,8 @@ import { NextResponse } from "next/server"
 import { Prisma } from "@prisma/client"
 
 type AttentionWithClient = Prisma.AttentionGetPayload<{
+  amount:number | null
+  currency:string | null
   include: { client: true }
 }>
 
