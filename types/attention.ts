@@ -1,4 +1,4 @@
-import { AttentionType,Priority,AttentionStatus } from "@/app/generated/prisma"
+import { AttentionType,Priority,AttentionStatus } from "@prisma/client"
 
 
 export interface AttentionDTO {
