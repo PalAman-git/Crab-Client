@@ -25,13 +25,13 @@ const page = () => {
           </p>
         )}
 
-        {attentions && attentions.length > 0 && (
+        {/* {attentions && attentions.length > 0 && (
           attentions.map((a) => (
             <AttentionCard key={a.id} attention={a} />
           )
 
           )
-        )}
+        )} */}
       </div>
     </>
   )
