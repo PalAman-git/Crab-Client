@@ -1,5 +1,5 @@
 import { fetchWithCookies } from "@/lib/api/fetchWithCookies"
-import { AttentionType, Priority } from "@/app/generated/prisma";
+import { AttentionType, Priority } from "@prisma/client";
 
 export type AttentionWithClient = {
   id: string

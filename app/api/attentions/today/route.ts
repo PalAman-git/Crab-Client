@@ -2,7 +2,7 @@ import { getUserIdAndSessionIdFromRequest } from "@/lib/api/getUserIdAndSessionI
 import { attentionService } from "@/services/attention/attention.service"
 import { ApiResponse } from "@/types/api"
 import { NextResponse } from "next/server"
-import { Prisma } from "@/app/generated/prisma"
+import { Prisma } from "@prisma/client"
 
 type AttentionWithClient = Prisma.AttentionGetPayload<{
   include: { client: true }
