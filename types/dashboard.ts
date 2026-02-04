@@ -1,5 +1,4 @@
-// types/dashboard.ts
-import { Priority } from "@/app/generated/prisma"
+import { Priority } from "@prisma/client"
 
 export type DashboardAttention = {
   id: string
