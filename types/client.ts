@@ -1,7 +1,16 @@
-export interface ClientDTO {
-    id:string
-    name:string
-    email?: string
+export type ClientStatus = "ACTIVE" | "PAUSED" | "COMPLETED"
+
+export interface Client {
+    status: ClientStatus;
+    id: string;
+    email: string | null;
+    name: string;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    totalBilled: number;
+    totalPaid: number;
+    lastContactedAt: Date | null;
 }
 
 export type CreateClientParams = {

@@ -51,7 +51,7 @@ export default function DashboardPage() {
             Nothing urgent 🎉
           </p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2 grid grid-cols-4 gap-4">
             {urgentAttentions.map(attention => (
               <AttentionCard
                 key={attention.id}

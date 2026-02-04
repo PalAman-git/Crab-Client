@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchSearchClient } from "./client.fetchFunctions";
+import { fetchSearchClient,fetchClients } from "./client.fetchFunctions";
 import { useDebounce } from '@/hooks/useDebounce'
-
 
 export function useSearchClientQuery(query:string){
     const debouncedQuery = useDebounce(query,300)
@@ -12,5 +11,12 @@ export function useSearchClientQuery(query:string){
         enabled:debouncedQuery.length >=2,
         staleTime:60_000,
         placeholderData:(previousData) => previousData,
+    })
+}
+
+export function useGetClients(){
+    return useQuery({
+        queryKey:['clients'],
+        queryFn:() => fetchClients(),
     })
 }

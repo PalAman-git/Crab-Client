@@ -1,6 +1,6 @@
 import { fetchWithCookies } from "@/lib/api/fetchWithCookies";
 import { ApiResponse } from "@/types/api";
-import { QueryClientResponse } from "@/types/client";
+import { Client, QueryClientResponse } from "@/types/client";
 
 type CreateClientPayload = {
     name:string,
@@ -37,3 +37,14 @@ export async function fetchSearchClient(query:string,limit=10){
     return json.data;
 }
 
+
+export async function fetchClients(){
+    const res = await fetchWithCookies('/api/clients/allClients');
+    const json:ApiResponse<Client[]> = await res.json();
+
+    if(!json.success){
+        throw new Error(json.error || 'Failed to get clients')
+    }
+
+    return json.data;
+}

@@ -25,6 +25,12 @@ class ClientService {
         })
     }
 
+    async getClientByClientId(clientId:string){
+        return prisma.client.findUnique({
+            where:{id:clientId}
+        })
+    }
+
     async assertClientOwnerhip(params: UserClientParams): Promise<void> {
         const { clientId, userId } = params
 
