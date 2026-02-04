@@ -2,9 +2,13 @@
 import { FormEvent, useState } from "react"
 import { Eye, EyeClosed } from "lucide-react"
 import { useLoginMutation } from "@/queries/auth/auth.mutations"
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
-    const { mutate:login,isPending,error } = useLoginMutation();
+    const { mutate: login, isPending, error } = useLoginMutation();
     const [passwordShown, setPasswordShown] = useState(false);
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -14,9 +18,13 @@ export default function LoginPage() {
         const email = formData.get('email')?.toString().trim();
         const password = formData.get('password')?.toString().trim();
 
-        if (!email || !password)  return;
+        if (!email || !password) return;
 
-        login({email,password});
+        login({email,password},{
+            onError:(error:any) => {
+                toast.error(error?.message || 'Invalid email or password');
+            }
+        })
     }
 
     const togglePasswordVisiblity = () => setPasswordShown((cur) => !cur);
@@ -74,13 +82,14 @@ export default function LoginPage() {
 
                     </div>
 
-                    <button
+                    <Button
                         type="submit"
                         disabled={isPending}
                         className="w-full mt-6 py-3 bg-accent text-accent-foreground rounded-md hover:bg-accent-hover transition-colors cursor-pointer"
                     >
-                       {isPending ? "Logging in..." : "Log In"}
-                    </button>
+                       
+                        {isPending ?  <> <Spinner data-icon='inline-start' /> Logging in...</> : "Log In"}
+                    </Button>
 
                     <div className="mt-4! flex justify-end">
                         <a
@@ -105,9 +114,9 @@ export default function LoginPage() {
 
                     <p className="text-muted-foreground text-sm mt-4 text-center">
                         Not registered?{" "}
-                        <a href="#" className="font-medium text-foreground hover:underline">
+                        <Link href="/register" className="font-medium text-foreground hover:underline">
                             Create account
-                        </a>
+                        </Link>
                     </p>
                 </form>
             </div>
