@@ -2,21 +2,32 @@ import { getUserIdAndSessionIdFromRequest } from "@/lib/api/getUserIdAndSessionI
 import { attentionService } from "@/services/attention/attention.service"
 import { ApiResponse } from "@/types/api"
 import { NextResponse } from "next/server"
-import { Prisma } from "@prisma/client"
+import { DashboardAttention } from "@/types/dashboard"
 
-type AttentionWithClient = Prisma.AttentionGetPayload<{
-  include: { client: true }
-}>
+
+export type AttentionWithClient = DashboardAttention
 
 export async function GET() {
   try {
     const { userId } = await getUserIdAndSessionIdFromRequest()
 
     const attentions = await attentionService.getTodaysAttentions(userId)
+    const attentionsToSend: AttentionWithClient[] = attentions.map(a => ({
+      id:a.id,
+      title:a.title,
+      priority:a.priority,
+      dueDate:a.dueDate ? a.dueDate.toISOString() : null,
+      amount: a.amount,
+      currency:a.currency,
+      client:{
+        id:a.client.id,
+        name:a.client.name,
+      }
+    }))
 
     const response: ApiResponse<AttentionWithClient[]> = {
       success: true,
-      data: attentions,
+      data: attentionsToSend,
     }
 
     return NextResponse.json(response, { status: 200 })

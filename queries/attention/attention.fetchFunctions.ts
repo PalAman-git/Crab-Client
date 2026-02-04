@@ -1,18 +1,6 @@
 import { fetchWithCookies } from "@/lib/api/fetchWithCookies"
 import { AttentionType, Priority } from "@prisma/client";
-
-export type AttentionWithClient = {
-  id: string
-  title: string
-  priority: Priority
-  type:AttentionType
-  dueDate: string | null
-  client: {
-    id: string
-    name: string
-    email: string | null
-  }
-}
+import { AttentionWithClient } from "@/app/api/attentions/today/route";
 
 type CreateAttentionInput = {
   clientId: string,

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { fetchAttentionToday } from "./attention.fetchFunctions"
-import { AttentionWithClient } from "./attention.fetchFunctions"
+import { AttentionWithClient } from "@/app/api/attentions/today/route"
 
 type AttentionsTodayQueryResponse = {
     attentions: AttentionWithClient[] | undefined,
