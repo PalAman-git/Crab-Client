@@ -6,7 +6,7 @@ import { useModeAnimation } from 'react-theme-switch-animation';
 import { Sun, Moon } from 'lucide-react';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   const { ref, toggleSwitchTheme, isDarkMode } = useModeAnimation({
@@ -18,12 +18,10 @@ export function ThemeToggle() {
   }, []);
 
   const handleToggle = () => {
-    // 1. Trigger animation FIRST (no args)
     toggleSwitchTheme();
-    
-    // 2. Then switch theme (async to sync with animation)
+
     setTimeout(() => {
-      setTheme(theme === 'dark' ? 'light' : 'dark');
+      setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
     }, 50);
   };
 
@@ -35,13 +33,23 @@ export function ThemeToggle() {
     <button
       ref={ref}
       onClick={handleToggle}
-      className="group cursor-pointer relative flex h-10 w-10 items-center justify-center rounded-xl border border-border/50 bg-card shadow-sm hover:bg-accent/10 hover:border-accent/30 hover:shadow-md hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background shrink-0"
-      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-border/50 bg-card shadow-sm hover:bg-accent/10 hover:border-accent/30 hover:shadow-md focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
     >
-      <div className="relative h-5 w-5">
-        <Sun className={`absolute h-5 w-5 transition-all ${isDarkMode ? 'scale-0 opacity-0' : 'scale-100 opacity-100'} text-foreground group-hover:text-accent`} />
-        <Moon className={`absolute h-5 w-5 transition-all ${isDarkMode ? 'scale-100 opacity-100' : 'scale-0 opacity-0'} text-accent-foreground group-hover:text-accent`} />
-      </div>
+      <Sun
+        className={`absolute h-5 w-5 transition-all ${
+          resolvedTheme === 'dark'
+            ? 'scale-0 opacity-0'
+            : 'scale-100 opacity-100'
+        }`}
+      />
+      <Moon
+        className={`absolute h-5 w-5 transition-all ${
+          resolvedTheme === 'dark'
+            ? 'scale-100 opacity-100'
+            : 'scale-0 opacity-0'
+        }`}
+      />
     </button>
   );
 }
