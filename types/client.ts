@@ -35,3 +35,8 @@ export type QueryClientResponse = {
     name:string,
     email?:string | null,
 }
+
+export type RecentClient = {
+    id:string
+    name:string
+}

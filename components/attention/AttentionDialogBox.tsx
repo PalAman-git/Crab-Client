@@ -47,7 +47,10 @@ import { Spinner } from '../ui/spinner'
 import { useSearchClientQuery } from '@/queries/client/client.queries'
 import { useCreateClientMutation } from '@/queries/client/client.mutations'
 import { toast } from 'sonner'
-import { AttentionType,Priority } from '@/types/attention'
+import { AttentionType, Priority } from '@/types/attention'
+import { useDebounce } from '@/hooks/useDebounce'
+import { useRecentClients } from '@/hooks/useRecentClients'
+import { CommandGroup } from 'cmdk'
 
 type Props = {
     open: boolean
@@ -73,15 +76,22 @@ export function AttentionDialog({ open, setOpen }: Props) {
     today.setHours(0, 0, 0, 0);
 
     // Client
+    const { recentClients, addRecentClient } = useRecentClients();
     const [selectedClient, setSelectedClient] = React.useState<{ id: string; name: string } | null>(null)
     const [query, setQuery] = React.useState('')
-    const { data: clients = [], isFetching: isFetchingClients } = useSearchClientQuery(query);
-    const { mutate: createAttention,   isPending: isCreateAttentionPending, error: attentionError    } = useCreateAttentionMutation();
-    const { mutateAsync: createClient, isPending: isCreateClientPending,    error: createClientError } = useCreateClientMutation();
+    const debouncedQuery = useDebounce(query, 300);
+    const { data: clients = [], isFetching: isFetchingClients } = useSearchClientQuery(debouncedQuery);
+    const { mutate: createAttention, isPending: isCreateAttentionPending, error: attentionError } = useCreateAttentionMutation();
+    const { mutateAsync: createClient, isPending: isCreateClientPending, error: createClientError } = useCreateClientMutation();
 
+    const trimmedQuery = query.trim()
+    const canCreateClient = trimmedQuery.length >= 2 && !isFetchingClients && !clients.some((client) => client.name.toLowerCase() === trimmedQuery.toLowerCase())
+    const filteredRecentClients = recentClients.filter((recentClient) => selectedClient?.id !== recentClient.id);
 
-    const canCreateClient = query.length >= 2 && !isFetchingClients && clients.length === 0;
-
+    const closePopover = () => {
+        setIsPopoverOpen(false);
+        setQuery("");
+    }
 
     const handleCreateAttention = async () => {
         if (!title || !selectedClient) {
@@ -122,14 +132,14 @@ export function AttentionDialog({ open, setOpen }: Props) {
             })
 
             setSelectedClient(newClient)
+            closePopover();
+            addRecentClient({ id: newClient.id, name: newClient.name });
             toast.success("Client Created", { position: 'top-center' });
-            setQuery("")
         } catch (e) {
             console.log(e);
             toast.error(createClientError?.message);
         }
     }
-
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -146,7 +156,12 @@ export function AttentionDialog({ open, setOpen }: Props) {
                         <div className="space-y-1 mb-5">
                             <Label>Client *</Label>
 
-                            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                            <Popover open={isPopoverOpen} onOpenChange={(open) => {
+                                setIsPopoverOpen(open)
+                                if (!open) {
+                                    setQuery("");
+                                }
+                            }}>
                                 <PopoverTrigger asChild>
                                     <Button variant="outline" role='combobox' className='w-full justify-between'>
                                         {selectedClient ? selectedClient?.name : "Select client"}
@@ -155,28 +170,54 @@ export function AttentionDialog({ open, setOpen }: Props) {
                                 </PopoverTrigger>
 
                                 <PopoverContent className='p-0'>
-                                    <Command>
-                                        <CommandInput placeholder='Search client...' value={query} onValueChange={(value) => {setQuery(value);setSelectedClient(null)}} />
+                                    <Command shouldFilter={query.length > 0} className="
+                                            **:[[cmdk-group-heading]]:px-2
+                                            **:[[cmdk-group-heading]]:py-2
+                                            **:[[cmdk-group-heading]]:text-xs
+                                            **:[[cmdk-group-heading]]:font-medium
+                                            **:[[cmdk-group-heading]]:uppercase
+                                            **:[[cmdk-group-heading]]:tracking-wide
+                                            **:[[cmdk-group-heading]]:text-muted-foreground
+                                            **:[[cmdk-group-heading]]:border-b
+                                            **:[[cmdk-group-heading]]:border-border
+                                            **:[[cmdk-group-heading]]:mb-1
+                                        ">
+                                        <CommandInput placeholder='Search client...' value={query} onValueChange={(value) => { setQuery(value); setSelectedClient(null) }} />
                                         <CommandList>
 
+                                            {/** RECENT CLIENTS */}
+                                            {query.length === 0 && filteredRecentClients.length > 0 && (
+                                                <CommandGroup heading="Recent clients">
+                                                    {filteredRecentClients.map((client) => (
+                                                        <CommandItem
+                                                            key={client.id}
+                                                            value={client.name}
+                                                            onSelect={() => {
+                                                                setSelectedClient(client)
+                                                                setIsPopoverOpen(false)
+                                                            }}>
+                                                            {client.name}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            )}
+
+                                            {/** LOADING */}
                                             {isFetchingClients && (
                                                 <CommandItem disabled>
                                                     Searching...
                                                 </CommandItem>
                                             )}
 
-                                            {/* {!isFetchingClients && clients.length === 0 && query.length >=2 &&(
-                                                <CommandEmpty>No client found</CommandEmpty>
-                                            )} */}
-
+                                            {/** SEARCH RESULTS */}
                                             {clients.map((client) => (
                                                 <CommandItem
                                                     key={client.id}
                                                     value={client.name}
                                                     onSelect={() => {
                                                         setSelectedClient(client)
-                                                        setQuery("")
-                                                        setIsPopoverOpen(false)
+                                                        addRecentClient({ id: client.id, name: client.name });
+                                                        closePopover();
                                                     }}
                                                 >
                                                     <Check
@@ -189,14 +230,32 @@ export function AttentionDialog({ open, setOpen }: Props) {
                                                 </CommandItem>
                                             ))}
 
+                                            {/** CREATE CLIENT */}
                                             {canCreateClient && (
                                                 <CommandItem
                                                     value={`create-${query}`}
                                                     onSelect={handleCreateClient}
-                                                    className="text-blue-600"
+                                                    className={cn(
+                                                        "mt-1 font-semibold flex items-center gap-2",
+                                                        "text-accent-foreground",
+                                                        "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground",
+                                                        isCreateClientPending && 'opacity-70 pointer-events-none'
+                                                    )}
                                                 >
-                                                    + Create "{query}"
+                                                    {isCreateClientPending ? (
+                                                        <>
+                                                            <Spinner className="h-4 w-4 animate-spin" />
+                                                            <span>Creating…</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span className="text-base leading-none">＋</span>
+                                                            <span>Create</span>
+                                                            <span className="truncate">“{query}”</span>
+                                                        </>
+                                                    )}
                                                 </CommandItem>
+
                                             )}
                                         </CommandList>
                                     </Command>
