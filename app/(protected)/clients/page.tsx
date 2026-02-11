@@ -17,7 +17,7 @@ export default function ClientsPage() {
         <CreateClientButton />
       </div>
 
-      <ul className="grid grid-cols-2 gap-2">
+      <ul className="grid grid-cols-2 gap-10">
         {clients && clients.length > 0 ? (
           clients.map((client) => (
             <li key={client.id} >

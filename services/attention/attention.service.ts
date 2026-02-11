@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma"
+import { AttentionOutput } from "@/types/attention"
 import { startOfDay, endOfDay } from "@/utils/dateTime"
 import { Prisma } from "@prisma/client"
 
@@ -31,6 +32,46 @@ class AttentionService {
         client: true,
       },
     })
+  }
+
+  async getAttentionByAttentionId(attentionId: string): Promise<AttentionOutput | null> {
+    const attention = await prisma.attention.findUnique({
+      where: { id: attentionId },
+      include:{
+        client:{
+          select:{
+            id:true,
+            name:true
+          }
+        }
+      }
+    })
+
+    if (!attention) return null;
+
+    return {
+      id: attention.id,
+      title: attention.title,
+      type: attention.type,
+      description: attention.description,
+      status: attention.status,
+      priority: attention.priority,
+
+      client:{
+        id:attention.client.id,
+        name:attention.client.name
+      },
+
+      dueDate: attention.dueDate,
+      createdAt: attention.createdAt,
+      completedAt: attention.completedAt ?? undefined,
+
+      amount: attention.amount ?? undefined,
+      currency: attention.currency ?? undefined,
+      isPaid: attention.isPaid,
+      paidAmount: attention.paidAmount ?? undefined,
+      invoiceNo: attention.invoiceNo ?? undefined,
+    };
   }
 }
 

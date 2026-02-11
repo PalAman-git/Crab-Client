@@ -5,13 +5,12 @@ import { useDashboardQuery } from "@/queries/dashboard/dashboard.queries"
 import NewAttentionButton from "@/components/attention/NewAttentionButton"
 import { AttentionCard } from "@/components/attention/AttentionCard"
 import { Card, CardContent } from "@/components/ui/card"
-import { DashboardAttention } from "@/types/dashboard"
 
 export default function DashboardPage() {
   const { user, isLoading: isUserLoading } = useMeQuery()
-  const { data, isLoading, isError } = useDashboardQuery()
+  const { data, isLoading: isDashboardLoading, isError } = useDashboardQuery()
 
-  if (isUserLoading || isLoading) {
+  if (isUserLoading || isDashboardLoading) {
     return (
       <div className="p-6 text-sm text-muted-foreground">
         Loading dashboard…
@@ -33,9 +32,9 @@ export default function DashboardPage() {
     <div className="space-y-6 p-6">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">
-          Welcome {user.name}!
+      <div className="flex items-center justify-between mb-10">
+        <h1 className="text-xl font-medium">
+          Welcome <span className="text-4xl font-bold">{user.name}</span>!
         </h1>
         <NewAttentionButton />
       </div>
@@ -51,11 +50,12 @@ export default function DashboardPage() {
             Nothing urgent 🎉
           </p>
         ) : (
-          <div className="space-y-2 grid grid-cols-4 gap-4">
+          <div className="space-y-2 grid grid-cols-3 gap-4">
             {urgentAttentions.map(attention => (
               <AttentionCard
                 key={attention.id}
                 attention={attention}
+                link={`/attentions/${attention.id}`}
               />
             ))}
           </div>
@@ -138,7 +138,7 @@ function StatCard({
     <Card>
       <CardContent className="p-4 space-y-1">
         <p className="text-sm text-muted-foreground">{label}</p>
-        <p className="text-xl font-semibold">{value}</p>
+        <p className="text-5xl font-semibold">{value}</p>
       </CardContent>
     </Card>
   )

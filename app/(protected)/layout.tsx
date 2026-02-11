@@ -33,7 +33,7 @@ export default function ProtectedLayout({ children }: { children: ReactNode; }) 
       <Sidebar />
       <div className="flex flex-1 flex-col border">
         <Navbar />
-        <main className="flex-1 overflow-y-auto p-6 bg-muted/40">
+        <main className="flex-1 overflow-y-auto py-10 px-50 bg-muted/40">
           {children}
         </main>
       </div>

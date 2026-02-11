@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import Providers from "./providers";
 import "./globals.css";
 import { Toaster } from "sonner";
@@ -7,6 +8,11 @@ import { Toaster } from "sonner";
 const manRope = Manrope({
   variable:"--font-manrope",
   subsets:["latin"]
+})
+
+const geistMono = Geist_Mono({
+  variable:"--font-geist-mono",
+  subsets:['latin'],
 })
 
 export const metadata: Metadata = {
@@ -22,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${manRope.variable} antialiased`}
+        className={`${geistMono.variable} antialiased`}
       >
         <Providers>{children}</Providers>
         <Toaster/>
