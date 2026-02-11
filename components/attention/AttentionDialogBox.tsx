@@ -75,17 +75,15 @@ export function AttentionDialog({ open, setOpen }: Props) {
     // Client
     const [selectedClient, setSelectedClient] = React.useState<{ id: string; name: string } | null>(null)
     const [query, setQuery] = React.useState('')
-    const { data: clients = [], isFetching } = useSearchClientQuery(query);
+    const { data: clients = [], isFetching: isFetchingClients } = useSearchClientQuery(query);
     const { mutate: createAttention,   isPending: isCreateAttentionPending, error: attentionError    } = useCreateAttentionMutation();
     const { mutateAsync: createClient, isPending: isCreateClientPending,    error: createClientError } = useCreateClientMutation();
 
 
-    const canCreate = query.length > 0 && !clients.some(
-        (c) => c.name.toLowerCase() === query.toLowerCase()
-    )
+    const canCreateClient = query.length >= 2 && !isFetchingClients && clients.length === 0;
 
 
-    const handleSubmit = async () => {
+    const handleCreateAttention = async () => {
         if (!title || !selectedClient) {
             alert('Title and Client are required')
             return
@@ -158,18 +156,18 @@ export function AttentionDialog({ open, setOpen }: Props) {
 
                                 <PopoverContent className='p-0'>
                                     <Command>
-                                        <CommandInput placeholder='Search client...' value={query} onValueChange={setQuery} />
+                                        <CommandInput placeholder='Search client...' value={query} onValueChange={(value) => {setQuery(value);setSelectedClient(null)}} />
                                         <CommandList>
 
-                                            {isFetching && (
+                                            {isFetchingClients && (
                                                 <CommandItem disabled>
                                                     Searching...
                                                 </CommandItem>
                                             )}
 
-                                            {!isFetching && clients.length === 0 && (
+                                            {/* {!isFetchingClients && clients.length === 0 && query.length >=2 &&(
                                                 <CommandEmpty>No client found</CommandEmpty>
-                                            )}
+                                            )} */}
 
                                             {clients.map((client) => (
                                                 <CommandItem
@@ -178,6 +176,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
                                                     onSelect={() => {
                                                         setSelectedClient(client)
                                                         setQuery("")
+                                                        setIsPopoverOpen(false)
                                                     }}
                                                 >
                                                     <Check
@@ -190,8 +189,9 @@ export function AttentionDialog({ open, setOpen }: Props) {
                                                 </CommandItem>
                                             ))}
 
-                                            {canCreate && !isFetching && (
+                                            {canCreateClient && (
                                                 <CommandItem
+                                                    value={`create-${query}`}
                                                     onSelect={handleCreateClient}
                                                     className="text-blue-600"
                                                 >
@@ -341,7 +341,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
                     <Button variant="outline" onClick={() => setOpen(false)}>
                         Cancel
                     </Button>
-                    <Button disabled={isCreateAttentionPending} onClick={handleSubmit}>
+                    <Button disabled={isCreateAttentionPending} onClick={handleCreateAttention}>
                         {isCreateAttentionPending ? (
                             <>
                                 <Spinner data-icon="inline-start" />
