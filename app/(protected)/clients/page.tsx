@@ -39,8 +39,7 @@ export default function ClientsPage() {
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {clients.map((client) => (
             <li key={client.id}>
-              <Link
-                href={`/clients/${client.id}`}
+              <div
                 className="
                   group block h-full rounded-xl border bg-card p-5
                   transition-all
@@ -60,9 +59,9 @@ export default function ClientsPage() {
 
                 {/* Footer */}
                 <div className="mt-4 flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">
+                  <Link href={`/clients/${client.id}`} className="text-muted-foreground">
                     View details
-                  </span>
+                  </Link>
 
                   <span className="
                     rounded-md bg-accent px-2.5 py-1
@@ -72,7 +71,7 @@ export default function ClientsPage() {
                     Open
                   </span>
                 </div>
-              </Link>
+              </div>
             </li>
           ))}
         </ul>

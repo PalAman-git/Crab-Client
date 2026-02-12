@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
-import { fetchAttentionToday } from "./attention.fetchFunctions"
+import { fetchAttentionToday, fetchOpenAttentions } from "./attention.fetchFunctions"
 import { AttentionWithClient } from "@/app/api/attentions/today/route"
+import { AttentionFilters } from "@/types/attention"
 
 type AttentionsTodayQueryResponse = {
     attentions: AttentionWithClient[] | undefined,
@@ -22,4 +23,11 @@ export function useAttentionsTodayQuery(){
     }
     
     return response
+}
+
+export function useGetOpenAttentions(filters:AttentionFilters){
+    return useQuery({
+        queryKey:['attentions',filters.priority ?? 'ALL',filters.type ?? 'ALL',filters.due ?? 'ALL',],
+        queryFn:() => fetchOpenAttentions(filters)
+    })
 }

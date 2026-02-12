@@ -3,14 +3,12 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
-    LayoutDashboard,
-    Clock,
-    AlertTriangle,
-    Calendar,
-    Users,
-    CreditCard,
-    Settings,
-    CircleFadingArrowUp
+  LayoutDashboard,
+  Users,
+  CreditCard,
+  Settings,
+  CircleFadingArrowUp,
+  NotepadText
 } from 'lucide-react'
 
 const Sidebar = () => {
@@ -18,12 +16,10 @@ const Sidebar = () => {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/today', label: 'Today', icon: Clock },
-    { href: '/overdue', label: 'Overdue', icon: AlertTriangle },
-    { href: '/upcoming', label: 'Upcoming', icon: Calendar },
+    { href: '/attentions', label: 'Attentions', icon: NotepadText },
     { href: '/clients', label: 'Clients', icon: Users },
     { href: '/invoices', label: 'Invoices', icon: CreditCard },
-    {href:'/upgrade',label:'Upgrade',icon:CircleFadingArrowUp}
+    { href: '/upgrade', label: 'Upgrade', icon: CircleFadingArrowUp }
   ]
 
   return (

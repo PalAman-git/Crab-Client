@@ -1,5 +1,5 @@
 import { fetchWithCookies } from "@/lib/api/fetchWithCookies"
-import { AttentionType,Priority } from "@/types/attention";
+import { AttentionFilters, AttentionType, AttentionPriority, AttentionListItem } from "@/types/attention";
 import { AttentionWithClient } from "@/app/api/attentions/today/route";
 
 type CreateAttentionInput = {
@@ -7,7 +7,7 @@ type CreateAttentionInput = {
   title: string,
   description?: string,
   type: AttentionType,
-  priority: Priority,
+  priority: AttentionPriority,
   amount?: number,
   dueDate?: Date,
 }
@@ -40,8 +40,28 @@ export async function fetchAttentionCreate(body: CreateAttentionInput) {
   })
   const json = await res.json();
 
-  if(!res.ok || !json.success){
+  if (!res.ok || !json.success) {
     throw new Error(json.error || "Failed to create attention")
   }
 
+}
+
+export async function fetchOpenAttentions(filters: AttentionFilters) {
+  const params = new URLSearchParams();
+
+  if (filters.priority) params.set('priority', filters.priority)
+  if (filters.type) params.set('type', filters.type)
+  if (filters.due) params.set('due', filters.due)
+
+  const res = await fetchWithCookies(
+    `/api/attentions/openAttentions?${params.toString()}`
+  )
+
+  const json : ApiResponse<AttentionListItem[]> = await res.json();
+
+  if (!json.success) {
+    throw new Error(json.error || "Failed to fetch open attentions")
+  }
+
+  return json.data
 }

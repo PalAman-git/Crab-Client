@@ -1,6 +1,6 @@
 
 export type AttentionType = "INVOICE" | 'DEADLINE' | 'FOLLOW_UP'
-export type Priority = "LOW" | "MEDIUM" | "HIGH"
+export type AttentionPriority = "LOW" | "MEDIUM" | "HIGH"
 export type AttentionStatus = 'OPEN' | "COMPLETED" | 'SNOOZED'
 
 
@@ -10,7 +10,7 @@ export interface AttentionOutput {
     type: AttentionType
     description: string | null
     status: AttentionStatus
-    priority: Priority
+    priority: AttentionPriority
     dueDate: Date | null
 
     client: {
@@ -27,6 +27,26 @@ export interface AttentionOutput {
     createdAt: Date
 }
 
+export type AttentionListItem = {
+    id:string
+    title:string
+    type:AttentionType
+    priority:AttentionPriority
+    status:AttentionStatus
+    dueDate:string | null //when?
+
+    client:{
+        id:string
+        name:string
+    }
+}
+
+export type AttentionFilters = {
+    priority?:AttentionPriority
+    type?:AttentionType
+    due?:'TODAY' | 'UPCOMING' | 'OVERDUE'
+}
+
 
 export type CreateAttentionInput = {
     userId: string
@@ -36,6 +56,6 @@ export type CreateAttentionInput = {
     description?: string
     amount?: number
     dueDate?: Date
-    priority?: Priority
+    priority?: AttentionPriority
 }
 
