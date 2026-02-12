@@ -7,27 +7,80 @@ import Link from "next/link";
 export default function ClientsPage() {
   const { data: clients, isLoading, error } = useGetClients();
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error instanceof Error) return <p>Something went wrong</p>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-40 text-muted-foreground">
+        Loading clients…
+      </div>
+    );
+
+  if (error instanceof Error)
+    return (
+      <div className="flex items-center justify-center h-40 text-destructive">
+        Something went wrong
+      </div>
+    );
 
   return (
-    <div>
-      <div className="flex justify-between">
-        <h1 className="text-4xl text-purple-600 mb-5">Clients</h1>
+    <div className="max-w-6xl mx-auto px-6 py-10 space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold">Clients</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage and view all your clients
+          </p>
+        </div>
         <CreateClientButton />
       </div>
 
-      <ul className="grid grid-cols-2 gap-10">
-        {clients && clients.length > 0 ? (
-          clients.map((client) => (
-            <li key={client.id} >
-              <Link href={`/clients/${client.id}`} className="p-4 font-medium bg-amber-200 rounded-xl">
-                {client.name}
+      {/* Clients grid */}
+      {clients && clients.length > 0 ? (
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {clients.map((client) => (
+            <li key={client.id}>
+              <Link
+                href={`/clients/${client.id}`}
+                className="
+                  group block h-full rounded-xl border bg-card p-5
+                  transition-all
+                  hover:border-accent
+                  hover:shadow-sm
+                "
+              >
+                <div className="space-y-2">
+                  <h2 className="text-lg font-medium group-hover:text-accent-foreground">
+                    {client.name}
+                  </h2>
+
+                  <p className="text-sm text-muted-foreground break-all">
+                    {client.email ?? "No email provided"}
+                  </p>
+                </div>
+
+                {/* Footer */}
+                <div className="mt-4 flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    View details
+                  </span>
+
+                  <span className="
+                    rounded-md bg-accent px-2.5 py-1
+                    text-xs font-medium text-accent-foreground
+                    group-hover:bg-accent-hover
+                  ">
+                    Open
+                  </span>
+                </div>
               </Link>
             </li>
-          ))
-        ) : (<p>No clients</p>)}
-      </ul>
+          ))}
+        </ul>
+      ) : (
+        <div className="rounded-xl border bg-card p-10 text-center text-muted-foreground">
+          No clients yet. Create your first one to get started.
+        </div>
+      )}
     </div>
   );
 }
