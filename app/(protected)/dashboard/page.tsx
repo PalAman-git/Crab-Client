@@ -5,6 +5,7 @@ import { useDashboardQuery } from "@/queries/dashboard/dashboard.queries"
 import NewAttentionButton from "@/components/attention/NewAttentionButton"
 import { AttentionCard } from "@/components/attention/AttentionCard"
 import { Card, CardContent } from "@/components/ui/card"
+import Link from "next/link"
 
 export default function DashboardPage() {
   const { user, isLoading: isUserLoading } = useMeQuery()
@@ -64,10 +65,10 @@ export default function DashboardPage() {
 
       {/* Stats */}
       <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard label="Today" value={stats.today} />
-        <StatCard label="Overdue" value={stats.overdue} />
-        <StatCard label="Pending" value={`₹${stats.pendingAmount}`} />
-        <StatCard label="Clients" value={stats.clients} />
+        <StatCard label="Today" value={stats.today} link='/today' />
+        <StatCard label="Overdue" value={stats.overdue} link='/overdue' />
+        <StatCard label="Pending" value={`₹${stats.pendingAmount}`} link='/invoices' />
+        <StatCard label="Clients" value={stats.clients} link='/clients' />
       </section>
 
       {/* Revenue + Suggestions */}
@@ -130,16 +131,20 @@ export default function DashboardPage() {
 function StatCard({
   label,
   value,
+  link
 }: {
   label: string
   value: string | number
+  link: string
 }) {
   return (
-    <Card>
-      <CardContent className="p-4 space-y-1">
-        <p className="text-sm text-muted-foreground">{label}</p>
-        <p className="text-5xl font-semibold">{value}</p>
-      </CardContent>
-    </Card>
+    <Link href={link}>
+      <Card>
+        <CardContent className="p-4 space-y-1">
+          <p className="text-sm text-muted-foreground">{label}</p>
+          <p className="text-5xl font-semibold">{value}</p>
+        </CardContent>
+      </Card>
+    </Link>
   )
 }
