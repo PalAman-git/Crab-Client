@@ -65,3 +65,17 @@ export async function fetchOpenAttentions(filters: AttentionFilters) {
 
   return json.data
 }
+
+export async function fetchDeleteAttention(id:string){
+  const res = await fetchWithCookies(`/api/attentions/${id}`,{
+    method:'DELETE',
+  })
+
+  const json:ApiResponse<boolean> = await res.json();
+
+  if(!json.success) {
+    throw new Error(json.error || 'Failed to delete attention')
+  }
+
+  return true
+}

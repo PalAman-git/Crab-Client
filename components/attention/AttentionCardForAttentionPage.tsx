@@ -1,12 +1,31 @@
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { AttentionListItem } from "@/types/attention"
 import Link from "next/link"
 import clsx from "clsx"
+import { MoreVertical, Trash2 } from "lucide-react"
+import { useDeleteAttention } from "@/queries/attention/attention.mutations"
 
 export function AttentionCard({ attention }: { attention: AttentionListItem }) {
-  const isOverdue =
-    attention.dueDate && new Date(attention.dueDate) < new Date()
+  const isOverdue = attention.dueDate && new Date(attention.dueDate) < new Date()
+  const { mutate:deleteAttention } = useDeleteAttention();
 
   return (
     <div className="rounded-2xl border bg-card p-5 transition hover:shadow-sm">
@@ -22,15 +41,62 @@ export function AttentionCard({ attention }: { attention: AttentionListItem }) {
           </p>
         </div>
 
-        <Badge
-          className={clsx(
-            attention.priority === "HIGH" && "bg-destructive/10 text-destructive",
-            attention.priority === "MEDIUM" && "bg-secondary",
-          )}
-          variant="outline"
-        >
-          {attention.priority}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge
+            className={clsx(
+              attention.priority === "HIGH" &&
+                "bg-destructive/10 text-destructive",
+              attention.priority === "MEDIUM" && "bg-secondary"
+            )}
+            variant="outline"
+          >
+            {attention.priority}
+          </Badge>
+
+          {/* Actions menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon" variant="ghost">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Delete this attention?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. The attention will be
+                      permanently removed.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction onClick={() => deleteAttention(attention.id)} className="bg-destructive hover:bg-destructive/90">
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {/* Meta */}
@@ -62,7 +128,7 @@ export function AttentionCard({ attention }: { attention: AttentionListItem }) {
           <Button size="sm" variant="secondary">
             Pause
           </Button>
-          <Button size="sm">
+          <Button size="sm" className="bg-accent/90 text-foreground font-medium hover:bg-accent-hover">
             Complete
           </Button>
         </div>

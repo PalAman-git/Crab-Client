@@ -242,6 +242,15 @@ class AttentionService {
       invoiceNo: attention.invoiceNo ?? undefined,
     };
   }
+
+  async deleteAttention(userId:string,attentionId:string){
+    return prisma.attention.delete({
+      where:{
+        id:attentionId,
+        userId
+      }
+    })
+  }
 }
 
 export const attentionService = new AttentionService()

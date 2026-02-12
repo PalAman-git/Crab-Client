@@ -47,7 +47,7 @@ import { Spinner } from '../ui/spinner'
 import { useSearchClientQuery } from '@/queries/client/client.queries'
 import { useCreateClientMutation } from '@/queries/client/client.mutations'
 import { toast } from 'sonner'
-import { AttentionType, Priority } from '@/types/attention'
+import { AttentionType, AttentionPriority } from '@/types/attention'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useRecentClients } from '@/hooks/useRecentClients'
 import { CommandGroup } from 'cmdk'
@@ -63,7 +63,7 @@ export function AttentionDialog({ open, setOpen }: Props) {
     const [title, setTitle] = React.useState('')
     const [description, setDescription] = React.useState('')
     const [type, setType] = React.useState<AttentionType>('FOLLOW_UP')
-    const [priority, setPriority] = React.useState<Priority>('MEDIUM')
+    const [priority, setPriority] = React.useState<AttentionPriority>('MEDIUM')
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
 
     // Invoice only
