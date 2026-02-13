@@ -8,8 +8,10 @@ import {
   CreditCard,
   Settings,
   CircleFadingArrowUp,
-  NotepadText
+  NotepadText,
+  Check
 } from 'lucide-react'
+import Image from "next/image"
 
 const Sidebar = () => {
   const pathname = usePathname()
@@ -19,14 +21,15 @@ const Sidebar = () => {
     { href: '/attentions', label: 'Attentions', icon: NotepadText },
     { href: '/clients', label: 'Clients', icon: Users },
     { href: '/invoices', label: 'Invoices', icon: CreditCard },
-    { href: '/upgrade', label: 'Upgrade', icon: CircleFadingArrowUp }
+    { href: '/upgrade', label: 'Upgrade', icon: CircleFadingArrowUp },
+    { href: '/completed', label: 'Completed', icon: Check }
   ]
 
   return (
     <aside className="hidden md:flex w-64 flex-col border-r bg-background">
       {/* Logo */}
-      <div className="h-16 flex items-center px-6 font-semibold">
-        🦀 Crab Client
+      <div className="h-16 flex items-center justify-center px-6 font-semibold">
+        <Image src={'/crabClient.svg'} height={100} width={200} alt="Crab client logo" />
       </div>
 
       {/* Navigation */}

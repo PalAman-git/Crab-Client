@@ -1,20 +1,47 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchAttentionCreate, fetchDeleteAttention } from "./attention.fetchFunctions";
+import { completeAttention, fetchAttentionCreate, fetchDeleteAttention } from "./attention.fetchFunctions";
 import { AttentionListItem } from "@/types/attention";
 
 
 export function useCreateAttentionMutation() {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: fetchAttentionCreate,
+  return useMutation({
+    mutationFn: fetchAttentionCreate,
 
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['attentions'] });
-            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-            queryClient.invalidateQueries({ queryKey: ["attentions", 'today'] });
-        }
-    })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['attentions'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ["attentions", 'today'] });
+    }
+  })
+}
+
+export function useCompleteAttention() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: completeAttention,
+
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['attentions', 'open'] })
+      const previous = queryClient.getQueryData(["attentions", 'open'])
+
+      queryClient.setQueryData(['attentions', 'open'], (old: any[]) => old?.filter(a => a.id !== id))
+
+      return { previous }
+    },
+
+    onError:(_err,_id,context) => {
+      queryClient.setQueryData(['attentions','open'],context?.previous)
+    },
+
+    onSuccess:() => {
+      queryClient.invalidateQueries({queryKey:['attentions']})
+      queryClient.invalidateQueries({queryKey:['attentions','open']});
+    }
+
+  })
 }
 
 export function useDeleteAttention() {
@@ -48,6 +75,9 @@ export function useDeleteAttention() {
     onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: ["attentions"],
+      })
+      queryClient.invalidateQueries({
+        queryKey:['attentions','completed']
       })
     },
   })

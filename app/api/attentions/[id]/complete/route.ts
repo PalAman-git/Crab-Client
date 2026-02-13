@@ -1,7 +1,6 @@
 import { getUserIdAndSessionIdFromRequest } from "@/lib/api/getUserIdAndSessionIdfromRequest"
 import { failedResponse, successResponse } from "@/lib/api/responses"
 import { attentionService } from "@/services/attention/attention.service"
-import { AttentionStatus } from "@/types/attention"
 
 type Params = {
     params: Promise<{
@@ -9,32 +8,24 @@ type Params = {
     }>
 }
 
-export async function PATCH(req: Request, { params }: Params) {
+export async function POST(_: Request, { params }: Params) {
     try {
         const { userId } = await getUserIdAndSessionIdFromRequest()
         const { id } = await params
 
-        const body = await req.json()
-        const status = body.status as AttentionStatus | undefined
-
-        if (!status) {
-            throw new Error("Status is required")
-        }
-
-        const updated = await attentionService.updateAttentionStatus(
+        const completed = await attentionService.completeAttention(
             userId,
-            id,
-            status,
+            id
         )
 
         return successResponse(
             {
-                id: updated.id,
-                status: updated.status,
+                id: completed.id,
+                status: completed.status,
             },
             200
         )
     } catch (err) {
-        return failedResponse(err, "Failed to update attention status")
+        return failedResponse(err, "Failed to complete attention")
     }
 }

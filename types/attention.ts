@@ -28,23 +28,25 @@ export interface AttentionOutput {
 }
 
 export type AttentionListItem = {
-    id:string
-    title:string
-    type:AttentionType
-    priority:AttentionPriority
-    status:AttentionStatus
-    dueDate:string | null //when?
+    id: string
+    title: string
+    type: AttentionType
+    priority: AttentionPriority
+    status: AttentionStatus
+    completedAt: string | null
+    dueDate: string | null //when?
 
-    client:{
-        id:string
-        name:string
+    client: {
+        id: string
+        name: string
     }
 }
 
 export type AttentionFilters = {
-    priority?:AttentionPriority
-    type?:AttentionType
-    due?:'TODAY' | 'UPCOMING' | 'OVERDUE'
+    status?: AttentionStatus
+    priority?: AttentionPriority
+    type?: AttentionType
+    due?: 'TODAY' | 'UPCOMING' | 'OVERDUE'
 }
 
 

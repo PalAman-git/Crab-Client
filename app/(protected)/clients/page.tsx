@@ -1,11 +1,17 @@
 'use client'
 
+import { ActionMenu } from "@/components/client/ActionMenu";
 import CreateClientButton from "@/components/client/CreateClientButton";
 import { useGetClients } from "@/queries/client/client.queries";
+import { Trash2 } from "lucide-react";
 import Link from "next/link";
 
 export default function ClientsPage() {
   const { data: clients, isLoading, error } = useGetClients();
+
+  const handleDeleteClient = (clientId: string) => {
+
+  }
 
   if (isLoading)
     return (
@@ -47,14 +53,27 @@ export default function ClientsPage() {
                   hover:shadow-sm
                 "
               >
-                <div className="space-y-2">
-                  <h2 className="text-lg font-medium group-hover:text-accent-foreground">
-                    {client.name}
-                  </h2>
+                <div className="space-y-2 flex justify-between">
+                  <div>
+                    <h2 className="text-lg font-medium group-hover:text-accent-foreground">
+                      {client.name}
+                    </h2>
 
-                  <p className="text-sm text-muted-foreground break-all">
-                    {client.email ?? "No email provided"}
-                  </p>
+                    <p className="text-sm text-muted-foreground break-all">
+                      {client.email ?? "No email provided"}
+                    </p>
+                  </div>
+                  <ActionMenu options={[{
+                    label: 'Delete',
+                    icon: <Trash2 className="h-4 w-4" />,
+                    onClick: () => handleDeleteClient(client.id),
+                    confirm:{
+                      title:'Delete this client?',
+                      description:"This action can't be undone.This client will be permanently deleted.",
+                      confirmLabel:'Delete'
+                    }
+                  },
+                    ]}/>
                 </div>
 
                 {/* Footer */}

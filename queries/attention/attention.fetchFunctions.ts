@@ -1,6 +1,5 @@
 import { fetchWithCookies } from "@/lib/api/fetchWithCookies"
 import { AttentionFilters, AttentionType, AttentionPriority, AttentionListItem } from "@/types/attention";
-import { AttentionWithClient } from "@/app/api/attentions/today/route";
 
 type CreateAttentionInput = {
   clientId: string,
@@ -19,21 +18,9 @@ type ApiResponse<T> = {
   error?: string
 }
 
-export async function fetchAttentionToday(): Promise<AttentionWithClient[]> {
-  const res = await fetchWithCookies("/api/attentions/today")
-
-  const json: ApiResponse<AttentionWithClient[]> = await res.json()
-
-  if (!res.ok || !json.success) {
-    throw new Error(json.error || "Failed to fetch attentions")
-  }
-
-  return json.data!
-}
-
 export async function fetchAttentionCreate(body: CreateAttentionInput) {
 
-  const res = await fetchWithCookies('/api/attentions/create', {
+  const res = await fetchWithCookies('/api/attentions', {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
@@ -54,13 +41,25 @@ export async function fetchOpenAttentions(filters: AttentionFilters) {
   if (filters.due) params.set('due', filters.due)
 
   const res = await fetchWithCookies(
-    `/api/attentions/openAttentions?${params.toString()}`
+    `/api/attentions?status=OPEN&${params.toString()}`
   )
 
   const json : ApiResponse<AttentionListItem[]> = await res.json();
 
   if (!json.success) {
     throw new Error(json.error || "Failed to fetch open attentions")
+  }
+
+  return json.data
+}
+
+export async function fetchCompletedAttentions(){
+  const res = await fetchWithCookies('/api/attentions?status=COMPLETED');
+
+  const json:ApiResponse<AttentionListItem[]> = await res.json();
+
+  if(!json.success){
+    throw new Error(json.error || "Failed to fetch completed attentions")
   }
 
   return json.data
@@ -78,4 +77,18 @@ export async function fetchDeleteAttention(id:string){
   }
 
   return true
+}
+
+export async function completeAttention(id:string){
+  const res = await fetchWithCookies(`/api/attentions/${id}/complete`,{
+    method:"POST"
+  })
+
+  const json = await res.json();
+
+  if(!json.success){
+    throw new Error(json.error || 'Failed to complete attention')
+  }
+
+  return json.data!
 }

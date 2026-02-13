@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma"
-import { AttentionFilters, AttentionListItem, AttentionOutput, AttentionStatus } from "@/types/attention"
+import { AttentionFilters, AttentionListItem, AttentionOutput, AttentionStatus, AttentionPriority, AttentionType } from "@/types/attention"
 import { startOfDay, endOfDay } from "@/utils/dateTime"
 import { Prisma } from "@prisma/client"
 
@@ -8,35 +8,92 @@ export type AttentionWithClient =
     include: { client: true }
   }>
 
+type UpdateAttentionInput = {
+  title?: string
+  description?: string | null
+  status?: AttentionStatus
+  priority?: AttentionPriority
+  type?: AttentionType
+  dueDate?: string | null
+  amount?: number | null
+}
+
+type CreateAttentionInput = {
+  title: string
+  description?: string
+  type: AttentionType
+  priority?: AttentionPriority
+  amount?: number
+  dueDate?: string
+  clientId: string
+}
+
 class AttentionService {
+  
+  private badRequest(message: string) {
+    const err: any = new Error(message)
+    err.status = 400
+    return err
+  }
 
-  async getTodaysAttentions(userId: string): Promise<AttentionWithClient[]> {
-    const todayStart = startOfDay()
-    const todayEnd = endOfDay()
+  private notFound(message:string){
+    const err:any = new Error(message)
+    err.status = 400
+    return err
+  }
 
-    return prisma.attention.findMany({
-      where: {
+
+  async createAttention(userId: string, input: CreateAttentionInput) {
+    const {
+      title,
+      description,
+      type,
+      priority,
+      amount,
+      dueDate,
+      clientId
+    } = input
+
+    if (!title || !type || !clientId) {
+      return this.badRequest("title,type and clientId are required");
+    }
+
+    const client = await prisma.client.findFirst({
+      where: { id: clientId, userId }
+    })
+
+    if (!client) {
+      return this.notFound("Client not found")
+    }
+
+    if (type === "INVOICE" && !amount) {
+      return this.badRequest("Amount required for invoice")
+    }
+
+    return prisma.attention.create({
+      data: {
+        title,
+        description,
+        type,
+        priority,
+        amount,
+        dueDate: dueDate ? new Date(dueDate) : null,
         userId,
-        status: "OPEN",
-        dueDate: {
-          gte: todayStart,
-          lte: todayEnd,
-        },
-      },
-      orderBy: [
-        { priority: "desc" },
-        { dueDate: "asc" },
-      ],
-      include: {
-        client: true,
-      },
+        clientId,
+      }
     })
   }
 
-  async getOpenAttentions(userId: string, filters?: AttentionFilters): Promise<AttentionListItem[]> {
+  async getAttentions(userId: string, filters?: AttentionFilters): Promise<AttentionListItem[]> {
     const where: any = {
       userId,
-      status: 'OPEN'
+    }
+
+    //Status filter (default OPEN)
+    if (filters?.status) {
+      where.status = filters.status
+    } else {
+      where.status = 'OPEN'
     }
 
     //Priority filter
@@ -83,7 +140,8 @@ class AttentionService {
       where,
       orderBy: [
         { priority: 'desc' },
-        { dueDate: 'asc' }
+        { dueDate: 'asc' },
+        { completedAt: 'desc' }
       ],
       select: {
         id: true,
@@ -92,6 +150,7 @@ class AttentionService {
         priority: true,
         status: true,
         dueDate: true,
+        completedAt: true,
         client: {
           select: {
             id: true,
@@ -107,6 +166,7 @@ class AttentionService {
       type: a.type,
       priority: a.priority,
       status: a.status,
+      completedAt: a.completedAt ? a.completedAt?.toISOString() : null,
       dueDate: a.dueDate ? a.dueDate.toISOString() : null,
       client: {
         id: a.client.id,
@@ -115,92 +175,39 @@ class AttentionService {
     }))
   }
 
-  async updateAttentionStatus(userId: string, id: string, status: AttentionStatus) {
-    return prisma.attention.update({
+  async updateAttention(userId: string, attentionId: string, input: UpdateAttentionInput) {
+    const existing = await prisma.attention.findFirst({
       where: {
-        id,
-        userId,
-      },
-      data: {
-        status,
-        completedAt: status === 'COMPLETED' ? new Date() : null,
+        id: attentionId,
+        userId
       }
     })
-  }
 
-  async getSnoozedAttentions(userId: string): Promise<AttentionListItem[]> {
-    const attentions = await prisma.attention.findMany({
-      where: {
-        userId,
-        status: 'SNOOZED'
-      },
-      orderBy: { updatedAt: 'desc' },
-      select: {
-        id: true,
-        title: true,
-        type: true,
-        priority: true,
-        status: true,
-        dueDate: true,
-        client: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
+    if (!existing) {
+      throw new Error('Attention not found');
+    }
+
+    const data: any = {}
+
+    if (input.title !== undefined) data.title = input.title
+    if (input.description !== undefined) data.description = input.description
+    if (input.status !== undefined) data.status = input.status
+    if (input.priority !== undefined) data.priority = input.priority
+    if (input.type !== undefined) data.type = input.type
+    if (input.amount !== undefined) data.amount = input.amount
+
+    if (input.dueDate !== undefined) {
+      data.dueDate = input.dueDate ? new Date(input.dueDate) : null
+    }
+
+    if (data.type === "INVOICE" && data.amount == null) {
+      throw new Error("Invoice attention requires amount");
+    }
+
+    return prisma.attention.update({
+      where: { id: attentionId },
+      data,
     })
-
-    return attentions.map((a) => ({
-      id: a.id,
-      title: a.title,
-      type: a.type,
-      priority: a.priority,
-      status: a.status,
-      dueDate: a.dueDate ? a.dueDate.toISOString() : null,
-      client: {
-        id: a.client.id,
-        name: a.client.name,
-      },
-    }))
-  }
-
-  async getCompletedAttentions(userId: string): Promise<AttentionListItem[]> {
-    const attentions = await prisma.attention.findMany({
-      where: {
-        userId,
-        status: 'COMPLETED'
-      },
-      orderBy: { completedAt: 'desc' },
-      select: {
-        id: true,
-        title: true,
-        type: true,
-        priority: true,
-        status: true,
-        dueDate: true,
-        client: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    })
-
-    return attentions.map((a) => ({
-      id: a.id,
-      title: a.title,
-      type: a.type,
-      priority: a.priority,
-      status: a.status,
-      dueDate: a.dueDate ? a.dueDate.toISOString() : null,
-
-      client: {
-        id: a.client.id,
-        name: a.client.name,
-      },
-    }))
   }
 
   async getAttentionByAttentionId(attentionId: string): Promise<AttentionOutput | null> {
@@ -243,14 +250,37 @@ class AttentionService {
     };
   }
 
-  async deleteAttention(userId:string,attentionId:string){
+  async deleteAttention(userId: string, attentionId: string) {
     return prisma.attention.delete({
-      where:{
-        id:attentionId,
+      where: {
+        id: attentionId,
         userId
       }
     })
   }
+
+  async completeAttention(userId: string, attentionId: string) {
+    const attention = await prisma.attention.findFirst({
+      where: { id: attentionId, userId },
+    })
+
+    if (!attention) {
+      throw new Error('Attention not found')
+    }
+
+    if (attention.status === 'COMPLETED') {
+      return attention
+    }
+
+    return prisma.attention.update({
+      where: { id: attentionId },
+      data: {
+        status: 'COMPLETED',
+        completedAt: new Date(),
+      }
+    })
+  }
+
 }
 
 export const attentionService = new AttentionService()

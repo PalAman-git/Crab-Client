@@ -20,12 +20,13 @@ import { Button } from "@/components/ui/button"
 import { AttentionListItem } from "@/types/attention"
 import Link from "next/link"
 import clsx from "clsx"
-import { MoreVertical, Trash2 } from "lucide-react"
-import { useDeleteAttention } from "@/queries/attention/attention.mutations"
+import { Check, MoreVertical, Trash2 } from "lucide-react"
+import { useCompleteAttention, useDeleteAttention } from "@/queries/attention/attention.mutations"
 
 export function AttentionCard({ attention }: { attention: AttentionListItem }) {
   const isOverdue = attention.dueDate && new Date(attention.dueDate) < new Date()
-  const { mutate:deleteAttention } = useDeleteAttention();
+  const { mutate: deleteAttention } = useDeleteAttention();
+  const { mutate: completeAttention, isPending: isAttentionCompletionPending } = useCompleteAttention();
 
   return (
     <div className="rounded-2xl border bg-card p-5 transition hover:shadow-sm">
@@ -45,7 +46,7 @@ export function AttentionCard({ attention }: { attention: AttentionListItem }) {
           <Badge
             className={clsx(
               attention.priority === "HIGH" &&
-                "bg-destructive/10 text-destructive",
+              "bg-destructive/10 text-destructive",
               attention.priority === "MEDIUM" && "bg-secondary"
             )}
             variant="outline"
@@ -126,10 +127,10 @@ export function AttentionCard({ attention }: { attention: AttentionListItem }) {
 
         <div className="flex gap-2">
           <Button size="sm" variant="secondary">
-            Pause
+            Snooze
           </Button>
-          <Button size="sm" className="bg-accent/90 text-foreground font-medium hover:bg-accent-hover">
-            Complete
+          <Button size="sm" onClick={() => completeAttention(attention.id)} disabled={isAttentionCompletionPending} className="bg-accent/90 text-foreground font-medium hover:bg-accent-hover">
+            {attention.status === 'COMPLETED' ? <><Check />Completed</> : 'Complete'}
           </Button>
         </div>
       </div>
