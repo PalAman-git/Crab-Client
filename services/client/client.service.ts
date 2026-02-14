@@ -1,66 +1,85 @@
 import prisma from "@/lib/prisma";
-import { UserClientParams, CreateClientParams, SearchClientParams } from "@/types/client";
-import { userService } from "../user/user.service";
+import { UserClientParams, CreateClientParams } from "@/types/client";
+
+type ClientFilters = {
+    search?: string
+    limit?: number
+}
 
 class ClientService {
+    async getClients(userId: string, filters?: ClientFilters) {
+        const take = filters?.limit && filters.limit > 0 ? Math.min(filters.limit,20) : undefined;
+
+        return prisma.client.findMany({
+            where: {
+                userId,
+                ...(filters?.search && {
+                    name: {
+                        contains: filters.search,
+                        mode: 'insensitive'
+                    },
+                }),
+            },
+            orderBy: { createdAt: 'desc' },
+            ...(take && {take}),
+        })
+    }
+
     async createClient(params: CreateClientParams) {
         const { name, userId, email } = params
 
-        const userExist = await userService.getUserById(userId);
-        if (!userExist) throw new Error("User not found")
+        if (!name) {
+            throw this.badRequest('client name is required')
+        }
 
         return prisma.client.create({
             data: {
                 name,
                 userId,
-                email
+                email,
+            },
+        })
+    }
+
+    async deleteClient(userId:string,clientId:string){
+        return prisma.client.delete({
+            where:{
+                id:clientId,
+                userId
             }
         })
     }
 
-    async getClientsByUserId(userId: string) {
-        return prisma.client.findMany({
-            where: { userId },
-            orderBy: { createdAt: "desc" }
-        })
-    }
-
-    async getClientByClientId(clientId:string){
+    async getClientById(userId:string,clientId: string) {
         return prisma.client.findUnique({
-            where:{id:clientId}
+            where: { id: clientId,userId }
         })
     }
 
-    async assertClientOwnerhip(params: UserClientParams): Promise<void> {
+    async assertClientOwnership(params: UserClientParams): Promise<void> {
         const { clientId, userId } = params
 
-        const count = await prisma.client.count({
+        const exists = await prisma.client.count({
             where: { id: clientId, userId }
         })
 
-        if (count === 0) throw new Error("Client does not belong to user")
+        if(!exists){
+            throw this.forbidden('Client does not belong to user');
+        }
+        
     }
 
-    async searchClients(params: SearchClientParams) {
-        const { userId, query, limit = 10 } = params
 
-        if (!query || query.length < 2) return []
+    private badRequest(message:string){
+        const err:any = new Error(message)
+        err.status = 400
+        return err
+    }
 
-        return prisma.client.findMany({
-            where: {
-                userId,
-                name: {
-                    contains: query,
-                    mode: 'insensitive',
-                },
-            },
-            orderBy: { createdAt: 'desc' },
-            take: limit,
-            select: {
-                id: true,
-                name: true,
-            }
-        })
+    private forbidden(message:string){
+        const err:any = new Error(message)
+        err.status = 403
+        return err
     }
 }
 

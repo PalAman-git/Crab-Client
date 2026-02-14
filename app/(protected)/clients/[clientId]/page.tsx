@@ -1,3 +1,5 @@
+import BackButton from "@/components/BackButton/BackButton";
+import { getUserIdAndSessionIdFromRequest } from "@/lib/api/getUserIdAndSessionIdfromRequest";
 import { clientService } from "@/services/client/client.service";
 import { notFound } from "next/navigation";
 
@@ -8,14 +10,16 @@ type Props = {
 };
 
 export default async function ClientPage({ params }: Props) {
+  const { userId } = await getUserIdAndSessionIdFromRequest();
   const { clientId } = await params;
-  const client = await clientService.getClientByClientId(clientId);
+  const client = await clientService.getClientById(userId, clientId);
 
   if (!client) notFound();
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
       {/* Header */}
+      <BackButton />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold text-gray-900">
@@ -28,11 +32,10 @@ export default async function ClientPage({ params }: Props) {
 
         {/* Status badge */}
         <span
-          className={`px-3 py-1 rounded-full text-sm font-medium ${
-            client.status === "ACTIVE"
-              ? "bg-green-100 text-green-700"
-              : "bg-gray-100 text-gray-600"
-          }`}
+          className={`px-3 py-1 rounded-full text-sm font-medium ${client.status === "ACTIVE"
+            ? "bg-green-100 text-green-700"
+            : "bg-gray-100 text-gray-600"
+            }`}
         >
           {client.status}
         </span>

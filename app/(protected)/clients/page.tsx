@@ -2,16 +2,15 @@
 
 import { ActionMenu } from "@/components/client/ActionMenu";
 import CreateClientButton from "@/components/client/CreateClientButton";
+import { useDeleteClient } from "@/queries/client/client.mutations";
 import { useGetClients } from "@/queries/client/client.queries";
 import { Trash2 } from "lucide-react";
 import Link from "next/link";
 
 export default function ClientsPage() {
   const { data: clients, isLoading, error } = useGetClients();
-
-  const handleDeleteClient = (clientId: string) => {
-
-  }
+  const { mutate: deleteClient, isPending: isDeleteClientPending } = useDeleteClient();
+  
 
   if (isLoading)
     return (
@@ -66,14 +65,14 @@ export default function ClientsPage() {
                   <ActionMenu options={[{
                     label: 'Delete',
                     icon: <Trash2 className="h-4 w-4" />,
-                    onClick: () => handleDeleteClient(client.id),
-                    confirm:{
-                      title:'Delete this client?',
-                      description:"This action can't be undone.This client will be permanently deleted.",
-                      confirmLabel:'Delete'
+                    onClick: () => deleteClient(client.id),
+                    confirm: {
+                      title: 'Delete this client?',
+                      description: "This action can't be undone.This client will be permanently deleted.",
+                      confirmLabel: 'Delete'
                     }
                   },
-                    ]}/>
+                  ]} />
                 </div>
 
                 {/* Footer */}
